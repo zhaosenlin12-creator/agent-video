@@ -5,48 +5,58 @@ import { AudioLayer } from "./audio";
 
 import { HookScene } from "./scenes/HookScene";
 import { StepScene } from "./scenes/StepScene";
-import { CutScene } from "./scenes/CutScene";
-import { FinsScene } from "./scenes/FinsScene";
-import { NozzleScene } from "./scenes/NozzleScene";
-import { WaterScene } from "./scenes/WaterScene";
-import { PumpScene } from "./scenes/PumpScene";
 import { CountdownScene } from "./scenes/CountdownScene";
 import { RealVideoScene } from "./scenes/RealVideoScene";
 import { EndCardScene } from "./scenes/EndCardScene";
+import { MaterialsScene } from "./scenes/MaterialsScene";
+import { DrawScene } from "./scenes/DrawScene";
+import { CutScene } from "./scenes/CutScene";
+import { GlueScene } from "./scenes/GlueScene";
+import { MotorScene } from "./scenes/MotorScene";
+import { PropScene } from "./scenes/PropScene";
+import { WireScene } from "./scenes/WireScene";
+import { BalanceScene } from "./scenes/BalanceScene";
+import { LaunchScene } from "./scenes/LaunchScene";
 
 const SceneRenderer: React.FC<{ idx: number }> = ({ idx }) => {
   const s = SCENES[idx];
-  switch (s.style) {
+  const stepProps = {
+    text: s.text,
+    emphasis: s.emphasis,
+    stepEn: s.stepLabel && s.stepLabel.en ? s.stepLabel.en : "",
+    stepCn: s.stepLabel && s.stepLabel.cn ? s.stepLabel.cn : "",
+    illustration: s.illustration ? s.illustration : "",
+  };
+  switch (s.sceneType) {
     case "Hook":
       return <HookScene text={s.text} emphasis={s.emphasis} />;
-    case "Step":
-      if (s.key === "03_cut")
-        return <CutScene text={s.text} emphasis={s.emphasis} stepEn={s.stepLabel!.en} stepCn={s.stepLabel!.cn} />;
-      if (s.key === "04_fins")
-        return <FinsScene text={s.text} emphasis={s.emphasis} stepEn={s.stepLabel!.en} stepCn={s.stepLabel!.cn} />;
-      if (s.key === "05_nozzle")
-        return <NozzleScene text={s.text} emphasis={s.emphasis} stepEn={s.stepLabel!.en} stepCn={s.stepLabel!.cn} />;
-      if (s.key === "06_water")
-        return <WaterScene text={s.text} emphasis={s.emphasis} stepEn={s.stepLabel!.en} stepCn={s.stepLabel!.cn} />;
-      if (s.key === "07_pump")
-        return <PumpScene text={s.text} emphasis={s.emphasis} stepEn={s.stepLabel!.en} stepCn={s.stepLabel!.cn} />;
-      return (
-        <StepScene
-          text={s.text}
-          emphasis={s.emphasis}
-          stepEn={s.stepLabel!.en}
-          stepCn={s.stepLabel!.cn}
-          illustration={s.illustration!}
-        />
-      );
+    case "Materials":
+      return <MaterialsScene {...stepProps} />;
+    case "Draw":
+      return <DrawScene {...stepProps} />;
+    case "Cut":
+      return <CutScene {...stepProps} />;
+    case "Glue":
+      return <GlueScene {...stepProps} />;
+    case "Motor":
+      return <MotorScene {...stepProps} />;
+    case "Prop":
+      return <PropScene {...stepProps} />;
+    case "Wire":
+      return <WireScene {...stepProps} />;
+    case "Balance":
+      return <BalanceScene {...stepProps} />;
+    case "Launch":
+      return <LaunchScene text={s.text} emphasis={s.emphasis} illustration={s.illustration ? s.illustration : ""} />;
     case "Counter":
-      return <CountdownScene number={s.counterNumber!} />;
-    case "Caption":
-      return <RealVideoScene text={s.text} emphasis={s.emphasis} videoSrc={s.videoSrc!} />;
+      return <CountdownScene number={s.counterNumber ? s.counterNumber : ""} />;
+    case "RealVideo":
+      return <RealVideoScene text={s.text} emphasis={s.emphasis} videoSrc={s.videoSrc ? s.videoSrc : ""} />;
     case "End":
       return <EndCardScene text={s.text} emphasis={s.emphasis} />;
+    default:
+      return <StepScene {...stepProps} />;
   }
-  return null;
 };
 
 export const Composition: React.FC = () => {
@@ -64,4 +74,3 @@ export const Composition: React.FC = () => {
     </AbsoluteFill>
   );
 };
-

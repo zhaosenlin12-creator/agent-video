@@ -1,5 +1,5 @@
 {
-  "name": "agent-video",
+  "name": "moneyprinter-water-rocket-remotion",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -22,18 +22,5 @@
     "@types/react": "19.0.0",
     "@types/react-dom": "19.0.0",
     "typescript": "5.4.5"
-  },
-  "description": "1080x1920 / 30fps / h264 crf 16 high-quality Douyin vertical short video pipeline (Remotion + PIL + edge-tts + Pexels)",
-  "keywords": [
-    "remotion",
-    "douyin",
-    "tiktok",
-    "vertical-video",
-    "short-video",
-    "chinese-tts",
-    "pexels"
-  ],
-  "author": "zhaosenlin12-creator",
-  "license": "MIT",
-  "homepage": "https://github.com/zhaosenlin12-creator/agent-video"
+  }
 }

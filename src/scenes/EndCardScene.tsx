@@ -35,7 +35,7 @@ export const EndCardScene: React.FC<{ text: string; emphasis: string[] }> = ({ t
         }}
       >
         <Img
-          src={staticFile("illustrations/08_countdown.png")}
+          src={staticFile("illustrations/11_soaring.png")}
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.65 }}
         />
       </div>

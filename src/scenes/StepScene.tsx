@@ -34,7 +34,7 @@ export const StepScene: React.FC<{
           }}
         />
       </div>
-      <StepLabel en={stepEn} cn={stepCn} />
+      {/* StepLabel disabled */}
       {overlay}
       <Caption text={text} emphasis={emphasis} bottom={210} fadeIn={10} size={68} />
     </Stage>

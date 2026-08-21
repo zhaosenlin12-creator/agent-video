@@ -1,404 +1,244 @@
-# 复用教程：从一段新文案到抖音竖屏成片
+﻿# 复用教程：从一段新文案到爆款竖屏成片
 
 > 本教程基于 `SOP.md`，目标是让你（或团队其他人）拿到新文案后，**2-4 小时内**产出同质量竖屏视频。
-> 已验证：水火箭文案 → 成片（52s），按本教程操作能完整复刻。
+> 已验证：水火箭文案 → 成片（52s），航模搭建文案 → 成片（67s），按本教程操作能完整复用。
 
 ---
 
-## 前置条件（一次准备）
+## Step 0：准备工作（10 分钟）
 
-| 工具 | 版本 | 用途 |
-|---|---|---|
-| Node.js | 20+ | 跑 Remotion |
-| ffmpeg | 6.x | 抽帧、ffprobe、ffplay（已含在大多数发行版） |
-| Python | 3.10+ | 跑 PIL + edge-tts |
-| Pillow | 10+ | `pip install pillow` |
-| edge-tts | 6.x | `pip install edge-tts` |
-| 中文字体 | Win 自带 `msyhbd.ttc` | Stage.tsx 里已声明字体栈 |
-
-一次性命令：
+### 0.1 克隆仓库
 
 ```powershell
-pip install pillow edge-tts
-cd D:\kaifa-teacher\moneyprinter\video_build\remotion
-npm install   # 安装 Remotion 依赖
+git clone https://github.com/zhaosenlin12-creator/agent-video.git
+cd agent-video
 ```
 
-确认 ffmpeg 能用：
+### 0.2 一键安装
 
 ```powershell
-ffmpeg -version | Select-Object -First 3
-ffprobe -version | Select-Object -First 3
+.\bootstrap.ps1
 ```
 
----
+这个脚本会：
+- 检查 Node 20+ / ffmpeg / Python 3.10+ / Pillow / edge-tts 是否齐全
+- `npm install` 安装 Remotion 4 + React 19
+- 测试 `npx remotion --version` 是否可用
 
-## 步骤 1：写文案
-
-**输入**：自然语言描述（80-160 字）。
-
-**示例**（水火箭）：
-
-> "塑料瓶也能飞上天！一个可乐瓶、一卷胶带、一把剪刀、一个打气筒就够了。
-> 沿瓶身中间剪开做成可以翻折的底座，硬卡纸剪三角翼十字缠绕胶带固定在瓶身两侧，
-> 瓶口装上喷嘴转接头胶带死死缠紧千万别漏气，往瓶子里倒三分之一的水太少没动力，
-> 瓶子倒扣在发射架上充气大约六个大气压。三！二！一！水火箭腾空而起，作用力与反作用力！
-> 全班同学瞬间炸锅鼓掌！全程没花一分钱，点赞收藏，跟着我下期做更酷的实验。"
-
-**模板**（填空）：
-
-```
-[一句话震撼结论（6-12 字）]
-[材料清单句（15-25  4-5 件材料并列）]
-[步骤 1 动作+要点（10-20 字）]
-[步骤 2 动作+要点（10-20 字）]
-[步骤 3 动作+要点（10-20 字）]
-[关键参数/安全提醒（10-20 字）]
-[倒计时 3！2！1！]
-[高潮结果（10-20 字）]
-[结果反馈（10-15 字）]
-[收尾互动（10-20 字）]
-```
-
----
-
-## 步骤 2：拆 `SceneDef[]`
-
-按 `SOP.md §2` 把文案拆成场景数组（参考 `src/data.ts` 的现有 13 场景）。
-
-**水火箭模板**（可直接复用）：
-
-```ts
-{ key: "01_hook",      style: "Hook",     text: "...", emphasis: [...] },
-{ key: "02_materials", style: "Step",     stepLabel: { en: "STEP 1", cn: "..." }, illustration: "..." },
-{ key: "03_cut",       style: "Step",     stepLabel: { en: "STEP 2", cn: "..." }, illustration: "..." },
-{ key: "04_fins",      style: "Step",     stepLabel: { en: "STEP 3", cn: "..." }, illustration: "..." },
-{ key: "05_nozzle",    style: "Step",     stepLabel: { en: "STEP 4", cn: "..." }, illustration: "..." },
-{ key: "06_water",     style: "Step",     stepLabel: { en: "STEP 5", cn: "..." }, illustration: "..." },
-{ key: "07_pump",      style: "Step",     stepLabel: { en: "STEP 6", cn: "..." }, illustration: "..." },
-{ key: "08_count3",    style: "Counter", counterNumber: "3", illustration: "..." },
-{ key: "09_count2",    style: "Counter", counterNumber: "2", illustration: "..." },
-{ key: "10_count1",    style: "Counter", counterNumber: "1", illustration: "..." },
-{ key: "11_launch",    style: "Caption", useRealVideo: true, videoSrc: "pexels/...launch.mp4" },
-{ key: "12_success",   style: "Caption", useRealVideo: true, videoSrc: "pexels/...success.mp4" },
-{ key: "13_endcard",   style: "End",     text: "...", emphasis: [...] },
-```
-
-`voiceSec` 先写 `0` 占位，下一步填实测值。
-`minDur` 暂定 `voiceSec + 0.4`（待步骤 3 后定）。
-
----
-
-## 步骤 3：edge-tts 生成旁白 + 测时长
+### 0.3 立刻试跑一遍
 
 ```powershell
-cd D:\kaifa-teacher\moneyprinter\video_build\remotion
+npm run build-h264
+.\qa\qa_check.ps1
+```
 
-# 1. 生成单条 TTS（替换 text）
-edge-tts --voice zh-CN-YunxiNeural --rate "+10%" `
-  --text "塑料瓶也能飞上天！" `
-  --write-media public/voice/01_hook.mp3
+如果 9/9 PASS → 进入 Step 1。
+如果有 FAIL → 看 `docs\QA_CHECKLIST.md` 对应章节排查。
 
-# 2. 批量：把要生成的句子放进 array，循环执行
-$sentences = @(
-  @{k="01_hook";      t="塑料瓶也能飞上天！"},
-  @{k="02_materials"; t="一个可乐瓶、一卷胶带、一把剪刀、一个打气筒就够了。"},
-  # ... 共 13 条
-)
-foreach ($s in $sentences) {
-  edge-tts --voice zh-CN-YunxiNeural --rate "+10%" --text $s.t `
-    --write-media "public/voice/$($s.k).mp3"
-}
+---
 
-# 3. 测每个 mp3 时长
-foreach ($s in $sentences) {
-  $d = ffprobe -v error -show_entries format=duration -of csv=p=0 `
-        "public/voice/$($s.k).mp3"
-  Write-Output "$($s.k) $d s"
+## Step 1：编写文案（30-60 分钟）
+
+文案模板（13 段，**80-160 字**总长度）：
+
+```
+[01_hook] 一句话爆点（<12 字），节奏感强
+[02_materials] N 件材料 / 工具清单
+[03_draw] 第二步，...
+[04_cut] 第三步，...
+[05_glue] 第四步，...
+[06_install_A] 第五步，...
+[07_install_B] 第六步，...
+[08_connect] 第七步，...
+[09_balance] 第八步，...
+[10_countdown] 三、二、一，发射！（或行动号令）
+[11_takeoff] 第一段真实反馈（爆点）
+[12_soaring] 第二段真实反馈（升华）
+[13_endcard] 点赞收藏 + 下一期预告
+```
+
+**要点**：
+- 每段 ≤ 14 字，否则 TTS > 4.5s 会让观众不耐烦
+- 关键动词用"亮黄高亮"（emphasis 字段），比如 `emphasis: ["搓架", "全班"]`
+- 真实视频段（第 11、12 段）的旁白用"事实+情绪"双层
+
+---
+
+## Step 2：修改 data.ts（10 分钟）
+
+打开 `src/data.ts`，把 `SCENES` 数组替换为你的 13 段。
+
+每个 SceneDef 字段：
+
+```typescript
+{
+  key: "01_hook",                          // 文件名 key
+  text: "一节课搓架航模，全班直接炸了！",  // TTS 文本
+  emphasis: ["一节课", "搓架航模"],        // 黄字高亮
+  voiceSec: 3.31,                          // edge-tts 实际时长
+  minDur: 4.0,                             // 最小场景时长
+  style: "Hook",                           // Hook | Step | Counter | Caption | End
+  illustration: "illustrations/01_hook.png", // 对应插画
+  sceneType: "Hook"                        // 路由到哪个场景组件
 }
 ```
 
-把测得的秒数写回 `src/data.ts` 的 `voiceSec`。
+13 段场景对应 sceneType：
+```
+Hook / Materials / Draw / Cut / Glue / Motor / Prop / Wire / Balance / Launch / RealVideo / End
+```
 
 ---
 
-## 步骤 4：生成 8 张干净插画 PNG
+## Step 3：录制 TTS（5 分钟）
 
-**改 `scripts/redraw.py`**：
-
-- 调整 `draw_*` 函数里的形状/颜色（保持调色板一致）
-- 哪些 PNG 元素必须画：主体（瓶子/火箭/家具/食物...） + 背景色
-- 哪些元素**禁止画在 PNG**（留给 React 动画叠加）：
-  - 飞入的碎片（fin/leaf/装饰）
-  - 流动的水/烟雾
-  - 数字/警示语/标签
-  - 高亮文字
-
-**跑脚本**：
+批量生成 13 个 mp3 到 `public\voice\`：
 
 ```powershell
-python scripts/redraw.py
-```
+$voice = "zh-CN-XiaoxiaoNeural"
+$rate = "+5%"
+$pitch = "+0Hz"
 
-**验证无水印**（关键！曾踩坑）：
+$lines = @{
+  "01_hook" = "一节课搓架航模，全班直接炸了！"
+  "02_materials" = "一张泡沫板、一个电机、一片螺旋桨、一块电池、一瓶胶水、一把刻刀。"
+  # ... 11 more
+}
 
-```powershell
-node -e "const fs=require('fs'); const {PNG}=require('pngjs'); const files=['02_materials.png','03_cut.png','04_fins.png','05_nozzle.png','06_water.png','07_pump.png']; for (const f of files) { const png=PNG.sync.read(fs.readFileSync('public/illustrations/'+f)); let dark=0; for (let y=180;y<400;y++) for (let x=740;x<820;x++) { const i=(png.width*y+x)<<2; if (png.data[i]<80 && png.data[i+1]<80 && png.data[i+2]<80) dark++; } console.log(f, 'darkPixels=', dark); }"
-```
-
-`darkPixels` 必须为 `0`（深色文字像素）。如果有 >0，说明 PNG 内部还有水印，重新生成。
-
----
-
-## 步骤 5：准备真实视频（Pexels）
-
-搜索关键词示例：
-
-- `water rocket launch`（水火箭发射）
-- `kids science experiment`（学生实验）
-- `chemistry reaction`（化学反应）
-- `success kids cheering`（欢呼）
-
-下载竖屏 mp4，**至少 5s**，分辨率 ≥ 720×1280。
-
-放路径：
-
-```
-public/pexels/7106862_actual_launch_vertical.mp4
-public/pexels/7106839_success_run.mp4
-```
-
-在 `data.ts` 里 `videoSrc` 字段对应改文件名。
-
----
-
-## 步骤 6：改 `src/data.ts`
-
-按 `SOP.md §2` 接口替换：
-
-```ts
-// 改这些字段：
-SCENES.map(s => ({
-  ...s,
-  text: "新文案",
-  emphasis: ["新关键词"],
-  voiceSec: 3.5,    // ← 步骤 3 实测值
-  videoSrc: "pexels/新视频.mp4",
-  illustration: "illustrations/新图.png"
-}))
-```
-
----
-
-## 步骤 7：改场景组件（动画模板）
-
-**保留**这 5 类场景组件的现成实现（已含动画模式库）：
-
-- `HookScene.tsx` — 替换 `text` / `illustration`
-- `RealVideoScene.tsx` — 替换 `videoSrc`
-- `CountdownScene.tsx` — 数字 3/2/1 自动从 `counterNumber` 取
-- `EndCardScene.tsx` — 替换 `text` 数组
-- `StepScene.tsx` — 通用步骤图（兜底用）
-
-**重写**这 5 类组件（不同动画逻辑）：
-
-- `CutScene.tsx`（切割类动作）
-- `FinsScene.tsx`（飞入零件类）
-- `NozzleScene.tsx`（部件安装类）
-- `WaterScene.tsx`（液体填充类）
-- `PumpScene.tsx`（仪表/数值类）
-
-每类套 `SOP.md §5.3` 的关键动画模式。
-
----
-
-## 步骤 8：preview 渲染验证
-
-```powershell
-cd D:\kaifa-teacher\moneyprinter\video_build\remotion
-
-# 先杀 chrome 残留
-Get-Process chrome -ErrorAction SilentlyContinue | Stop-Process -Force
-Remove-Item -Recurse -Force 'D:\cache\tmp\*' -ErrorAction SilentlyContinue
-
-# 跑 preview（~2 分钟）
-npm run build-preview
-```
-
----
-
-## 步骤 9：抽帧验收
-
-按时间点抽 13 帧（用 `SOP.md §6.3` 模板）：
-
-```powershell
-$frames = @(
-  @{t=1.8; n="01_hook.png"},       # Hook 段
-  @{t=6;   n="02_materials.png"},  # Step 1 末尾
-  @{t=11;  n="03_cut.png"},        # Step 2 中段
-  @{t=15;  n="04_fins.png"},       # Step 3 末尾
-  @{t=20;  n="05_nozzle.png"},     # Step 4 中段
-  @{t=26;  n="06_water.png"},      # Step 5 中段
-  @{t=31;  n="07_pump.png"},       # Step 6 末尾
-  @{t=33;  n="08_count3.png"},     # 倒计时 3
-  @{t=40;  n="11_launch.png"},     # 真实视频
-  @{t=44;  n="12_success.png"},    # 真实视频
-  @{t=49;  n="13_endcard.png"}     # 结束卡
-)
-foreach ($f in $frames) {
-  ffmpeg -y -ss $f.t -i out/preview.mp4 -frames:v 1 qa/final_frames/$f.n
+foreach ($k in $lines.Keys) {
+  edge-tts --voice $voice --rate $rate --pitch $pitch --text $lines[$k] --write-media "public\voice\$k.mp3"
 }
 ```
 
-人工肉眼检查（关键）：
-
-- [ ] 13 张图全部干净（无中文水印透出）
-- [ ] 至少 3 张能看到动态元素在动画状态中
-- [ ] 真实视频帧在播放 Pexels 视频而非插画
-- [ ] 数字倒计时显示 3/2/1
+⚠️ **坑**：`--rate "+5%"` 必须带引号。
 
 ---
 
-## 步骤 10：高质量 h264 成片
+## Step 4：生成插画（5-10 分钟）
+
+修改 `scripts\redraw.py`：
+
+1. `draw_step(num, cn_title, en_subtitle, drawer)` 调用列表更新为你的 13 段
+2. 如果有新场景类型，加 `draw_XX_xxx(d, sx, sy, sw)` 函数
+3. 运行：
 
 ```powershell
-cd D:\kaifa-teacher\moneyprinter\video_build\remotion
-npm run build-h264   # ~85 秒
+python scripts\redraw.py
 ```
 
-ffprobe 校验：
+⚠️ **坑**：中文文字必须 `font=font(N, bold=True, en=False)`，否则变成豆腐块。
+
+---
+
+## Step 5：下载 Pexels 视频（10-30 分钟）
+
+去 https://www.pexels.com/search/videos/<关键词> 找 8 段 CC0 视频，存到 `public\pexels\`：
+
+- `airport_takeoff.mp4` — 飞机起飞 / 机场
+- `drone_view1.mp4` — 居民区俯视
+- `drone_view2.mp4` — 城市航拍
+- `hands_craft.mp4` — 手工作业
+- `paper_foam.mp4` — 纸张/泡沫板特写
+- `wing_view.mp4` — 舷窗外
+- `medal_success.mp4` — 奖牌
+- `trophy_winner.mp4` — 举奖杯
+
+---
+
+## Step 6：编写 / 调整场景组件（30-90 分钟）
+
+如果你的 13 段结构和模板一致，复用现有 13 个组件即可。
+
+如果新增场景类型：
+1. 创建 `src\scenes\YourScene.tsx`
+2. 在 `src\Composition.tsx` 的 switch 加 case
+3. 在 `src\data.ts` 给对应 SCENE 设 `sceneType: "Your"`
+
+每个场景组件核心结构：
+
+```tsx
+export const YourScene: React.FC<{text, emphasis, illustration, ...}> = (props) => {
+  const f = useCurrentFrame();
+  const drop = interpolate(f, [10, 35], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  return (
+    <Stage bg="#dee9f3">
+      <Img src={staticFile(illustration)} style={{...}} />
+      {/* SVG overlay 动效 */}
+      <svg>...</svg>
+      <Caption text={text} emphasis={emphasis} bottom={210} />
+    </Stage>
+  );
+};
+```
+
+---
+
+## Step 7：渲染（30-60 秒）
 
 ```powershell
-ffprobe -v error -select_streams v:0 `
-  -show_entries stream=codec_name,width,height,r_frame_rate,nb_frames,bit_rate `
-  -show_entries format=duration,size `
-  -of default out/water-rocket-h264.mp4
+npx remotion render WaterRocketDouyin out\video-h264.mp4 --codec h264 --crf 17
 ```
 
-期望：
-
-```
-codec_name=h264
-width=1080
-height=1920
-r_frame_rate=30/1
-bit_rate=5500000~6000000
-nb_frames=1200~2100
-duration=40~70
-```
+⚠️ 如果 size > 50MB，先试 `--crf 17`（推荐），还不行改 `--crf 18`。
 
 ---
 
-## 步骤 11：ffplay 真实播放验证
+## Step 8：QA 验收（30 秒）
 
 ```powershell
-$log = "ffplay_log.txt"
-$proc = Start-Process ffplay -ArgumentList `
-  "-autoexit","-nodisp","-hide_banner","-loglevel","quiet","-stats",
-  "out/water-rocket-h264.mp4" `
-  -RedirectStandardError $log -PassThru -NoNewWindow
-Start-Sleep 60
-if (-not $proc.HasExited) { $proc | Stop-Process }
-Get-Content $log -Tail 5
+.\qa\qa_check.ps1
 ```
 
-期望：
+必须 9/9 PASS：
+- A1-A6 规格（分辨率/帧率/编码/时长/大小/码率）
+- B1 13 帧抽帧
+- C1 13 个 voice mp3
+- C2 ffplay 完整播放无错
 
-- 进程跑完 60 秒后退出
-- 最后一行的 `aq=` 衰减到 `0KB`
-- 无 stderr 错误
+任意 FAIL → 按 `docs\QA_CHECKLIST.md` 排查 → 修复 → 重跑。
 
 ---
 
-## 步骤 12：抽最终 13 帧 + contact sheet
-
-按 `SOP.md §6.3` 重抽最终帧：
+## Step 9：抽帧样张 + 交付
 
 ```powershell
-foreach ($f in $frames) {
-  ffmpeg -y -ss $f.t -i out/water-rocket-h264.mp4 -frames:v 1 -q:v 2 qa/final_frames/$f.n
-}
+ffmpeg -y -i out\video-h264.mp4 -vf "fps=1/5,scale=270:480,tile=4x4" -frames:v 1 -update 1 qa\remotion_final_sheet.jpg
 ```
 
-生成 4x3 contact sheet（用 `scripts/contact_sheet.ps1`）：
-
-```powershell
-$sheetDir = "qa\sheet"
-New-Item -ItemType Directory -Force -Path $sheetDir
-foreach ($f in $frames) {
-  ffmpeg -y -ss $f.t -i out/water-rocket-h264.mp4 -frames:v 1 `
-    -vf "scale=540:-2" -q:v 4 "$sheetDir\$($f.n -replace '.png','.jpg')"
-}
-$names = Get-ChildItem "$sheetDir\*.jpg" | Sort-Object Name |
-  ForEach-Object { "file '$sheetDir/$($_.Name)'" }
-$list = "$sheetDir\_list.txt"
-[System.IO.File]::WriteAllLines($list, $names, [System.Text.UTF8Encoding]::new($false))
-ffmpeg -y -f concat -safe 0 -i $list `
-  -filter_complex "scale=540:-2,tile=4x3:padding=10:color=black" `
-  qa/remotion_final_sheet.jpg
-```
+样张 4×4 网格，13 段全覆盖。如果任意帧有"？"或布局混乱，回到 Step 6 修复对应组件。
 
 ---
 
-## 步骤 13：交付
+## 微调（按需）
 
-```powershell
-# 复制成片到 deliver/
-Copy-Item out/water-rocket-h264.mp4 `
-  D:\kaifa-teacher\moneyprinter\deliver\<主题>_remotion_抖音竖屏超清.mp4
+### 改 BGM 音量
 
-# 复制 contact sheet
-Copy-Item qa/remotion_final_sheet.jpg `
-  D:\kaifa-teacher\moneyprinter\deliver\<主题>_成片_抽帧样张.jpg
+`src\audio.tsx`：`volume={() => 0.18}` — 0.18 是默认值。如果旁白更响就降到 0.12。
 
-# 跑 QA_CHECKLIST.md 验收
-Get-Content QA_CHECKLIST.md   # 19 项 checkbox
-```
+### 改 TTS 语速
 
-文件名格式：
+`edge-tts --rate "+8%"` — 比默认 +5% 更快，适合节奏紧凑的剪辑。
 
-- `<主题>_remotion_抖音竖屏超清.mp4`
-- `<主题>_成片_抽帧样张.jpg`
+### 加字幕动画
+
+每个 Caption 已经自动 fade-in / highlight（黄字）。如果想加 stroke 描边，编辑 `src\components\Caption.tsx` 的 `textShadow` 改成 `textShadow: "0 0 8px #000, 0 0 18px #000"`。
+
+### 加更多真实视频
+
+直接修改 `data.ts` 里 11_takeoff / 12_soaring 的 `videoSrc`，指向新下载的 Pexels 文件。
 
 ---
 
-## 微调速查表
+## 验收 Checklist（自查）
 
-| 想改什么 | 动哪里 |
-|---|---|
-| 单条文案 | `src/data.ts` 的 `text` 和 `emphasis` |
-| 时长变长/短 | `src/data.ts` 的 `voiceSec` 和 `minDur` |
-| 插画颜色/形状 | `scripts/redraw.py` 的 `draw_*` 函数 |
-| 真实视频片段 | 替换 `public/pexels/*.mp4`（保持文件名） |
-| 动画速度 | `src/scenes/<key>.tsx` 的 `interpolate(f, [from, to])` 范围 |
-| 字号 | `src/components/Caption.tsx` 的 `size` 默认值，或场景组件里 `<Caption size={...}>` |
-| 标题色 | `src/components/HookHeadline.tsx` 的 `color` / `WebkitTextStroke` |
-| 倒计时字色 | `src/components/CounterNumber.tsx` 的 `color` |
-| BGM 音量 | `src/audio.tsx` 的 `volume={() => 0.18}` |
-| BGM 切换 | 替换 `public/music/output014.mp3` |
-| 渲染并发 | `remotion.config.ts` 的 `Config.setConcurrency(2)` |
+产出前对照检查：
 
----
-
-## 时间预算（参考）
-
-| 阶段 | 耗时 |
-|---|---|
-| 写文案 + 拆 SceneDef | 30 分钟 |
-| edge-tts 13 段 | 5 分钟 |
-| 改 redraw.py 生成 8 张 PNG | 30 分钟（含 debug） |
-| 改 data.ts + 5 类场景组件 | 60 分钟 |
-| preview 渲染 | 2 分钟 |
-| 抽帧验收 + 调动画 | 30 分钟 |
-| h264 渲染 | 85 秒 |
-| ffplay 验证 + contact sheet | 10 分钟 |
-| **合计** | **约 3 小时** |
-
----
-
-## 下一步建议
-
-- 把本教程打印成 PDF 给团队成员
-- 在新内容上跑通 2-3 次后，把常用 SceneDef 模板沉淀成 YAML / JSON
-- 接入 TTS 自动化（一键生成 mp3）
-- 接入 Pexels API 自动搜索下载
+- [ ] 13 段结构完整（Hook + 8 steps + countdown + 2 real + end）
+- [ ] data.ts 每段都有 sceneType
+- [ ] voice mp3 13 个，命名匹配 SCENE.key
+- [ ] illustrations 12 张（10_launch / 11_soaring / 13_endcard 是单独函数画）
+- [ ] pexels 至少 2 段（11 + 12 用）
+- [ ] 没有任何"？"乱码
+- [ ] QA 9/9 PASS
+- [ ] 抽帧样张视觉清晰，无明显缺陷
+- [ ] 文件名用 `_remotion_抖音竖屏超清` 后缀

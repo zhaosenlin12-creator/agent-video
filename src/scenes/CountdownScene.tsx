@@ -35,7 +35,7 @@ export const CountdownScene: React.FC<{ number: string }> = ({ number }) => {
         }}
       >
         <Img
-          src={staticFile("illustrations/08_countdown.png")}
+          src={staticFile("illustrations/11_soaring.png")}
           style={{
             position: "absolute",
             inset: 0,

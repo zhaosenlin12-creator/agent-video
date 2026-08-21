@@ -1,19 +1,20 @@
-﻿// All scene data for the water-rocket Douyin video.
-// Durations (in seconds) come from the previous ffmpeg probe of each edge_tts voice mp3.
+// All scene data for the "一节课搓架航模" video.
+// 13 scenes: 1 Hook + 8 build steps + 1 countdown + 2 real flight + 1 End card.
+// Durations use voiceSec from edge-tts + 0.4s padding, min 4.5s for steps.
 
 export type SceneKey =
   | "01_hook"
   | "02_materials"
-  | "03_cut"
-  | "04_fins"
-  | "05_nozzle"
-  | "06_water"
-  | "07_pump"
-  | "08_count3"
-  | "09_count2"
-  | "10_count1"
-  | "11_launch"
-  | "12_success"
+  | "03_draw"
+  | "04_cut"
+  | "05_glue"
+  | "06_motor"
+  | "07_prop"
+  | "08_wire"
+  | "09_balance"
+  | "10_countdown"
+  | "11_takeoff"
+  | "12_soaring"
   | "13_endcard";
 
 export type StepStyle = "Hook" | "Step" | "Counter" | "Caption" | "End";
@@ -30,22 +31,27 @@ export interface SceneDef {
   useRealVideo?: boolean;
   videoSrc?: string;
   illustration?: string;
+  sceneType?: string; // dispatches to specific scene component
 }
 
 export const SCENES: SceneDef[] = [
-  { key: "01_hook",      text: "塑料瓶也能飞上天！",          emphasis: ["塑料瓶", "飞上天"],     voiceSec: 2.35, minDur: 3.0, style: "Hook",    illustration: "illustrations/01_hook.png" },
-  { key: "02_materials", text: "一个可乐瓶、一卷胶带、一把剪刀、一个打气筒就够了。", emphasis: ["可乐瓶", "胶带", "打气筒"], voiceSec: 4.85, minDur: 5.0, style: "Step", stepLabel: { en: "STEP 1", cn: "准备材料" }, illustration: "illustrations/02_materials.png" },
-  { key: "03_cut",       text: "沿瓶身中间剪开，做成可以翻折的底座。",            emphasis: ["剪开", "底座"],         voiceSec: 3.74, minDur: 4.5, style: "Step", stepLabel: { en: "STEP 2", cn: "切割瓶身" }, illustration: "illustrations/03_cut.png" },
-  { key: "04_fins",      text: "硬卡纸剪三角翼，十字缠绕胶带固定在瓶身两侧。",     emphasis: ["三角翼", "十字缠绕"],    voiceSec: 4.80, minDur: 4.8, style: "Step", stepLabel: { en: "STEP 3", cn: "加装机翼" }, illustration: "illustrations/04_fins.png" },
-  { key: "05_nozzle",    text: "瓶口装上喷嘴转接头，胶带死死缠紧，千万别漏气。",   emphasis: ["喷嘴", "千万别漏气"],   voiceSec: 5.02, minDur: 4.8, style: "Step", stepLabel: { en: "STEP 4", cn: "安装喷嘴" }, illustration: "illustrations/05_nozzle.png" },
-  { key: "06_water",     text: "往瓶子里倒三分之一的水，太多飞不远，太少没动力。", emphasis: ["三分之一", "没动力"],   voiceSec: 4.43, minDur: 4.8, style: "Step", stepLabel: { en: "STEP 5", cn: "加入水" }, illustration: "illustrations/06_water.png" },
-  { key: "07_pump",      text: "瓶子倒扣在发射架上，充气大约六个大气压。",         emphasis: ["六个大气压", "安全线"],  voiceSec: 3.81, minDur: 4.6, style: "Step", stepLabel: { en: "STEP 6", cn: "开始充气" }, illustration: "illustrations/07_pump.png" },
-  { key: "08_count3",    text: "三！",                                          emphasis: ["三"],                  voiceSec: 0.69, minDur: 1.4, style: "Counter", counterNumber: "3", illustration: "illustrations/08_countdown.png" },
-  { key: "09_count2",    text: "二！",                                          emphasis: ["二"],                  voiceSec: 0.61, minDur: 1.4, style: "Counter", counterNumber: "2", illustration: "illustrations/08_countdown.png" },
-  { key: "10_count1",    text: "一！",                                          emphasis: ["一"],                  voiceSec: 0.56, minDur: 1.4, style: "Counter", counterNumber: "1", illustration: "illustrations/08_countdown.png" },
-  { key: "11_launch",    text: "水火箭腾空而起！作用力与反作用力！",                emphasis: ["腾空而起", "作用力"],   voiceSec: 3.65, minDur: 5.0, style: "Caption", useRealVideo: true, videoSrc: "pexels/7106862_actual_launch_vertical.mp4" },
-  { key: "12_success",   text: "全班同学瞬间炸锅鼓掌！",                          emphasis: ["全班", "鼓掌"],        voiceSec: 2.61, minDur: 4.5, style: "Caption", useRealVideo: true, videoSrc: "pexels/7106839_success_run.mp4" },
-  { key: "13_endcard",   text: "全程没花一分钱，点赞收藏，跟着我下期做更酷的实验。", emphasis: ["点赞收藏", "更酷的实验"], voiceSec: 5.21, minDur: 5.8, style: "End", illustration: "illustrations/08_countdown.png" },
+  { key: "01_hook",        text: "一节课搓架航模，全班直接炸了！",                                          emphasis: ["一节课", "搓架航模", "全班炸了"],                voiceSec: 3.31, minDur: 4.0, style: "Hook",    illustration: "illustrations/01_hook.png",         sceneType: "Hook" },
+
+  { key: "02_materials",   text: "一张泡沫板、一个电机、一片螺旋桨、一块电池、一瓶胶水、一把刻刀。",         emphasis: ["泡沫板", "电机", "螺旋桨", "电池", "胶水", "刻刀"], voiceSec: 6.91, minDur: 5.5, style: "Step", stepLabel: { en: "STEP 1", cn: "准备材料" }, illustration: "illustrations/02_materials.png",  sceneType: "Materials" },
+  { key: "03_draw",        text: "第二步，在泡沫板上画出机翼、机身、尾翼的轮廓。",                              emphasis: ["画轮廓", "机翼、机身、尾翼"],                    voiceSec: 5.14, minDur: 5.0, style: "Step", stepLabel: { en: "STEP 2", cn: "画设计图" }, illustration: "illustrations/03_draw.png",       sceneType: "Draw" },
+  { key: "04_cut",         text: "第三步，刻刀沿线切开，泡沫板一分为二。",                                    emphasis: ["刻刀切开", "一分为二"],                          voiceSec: 4.30, minDur: 5.0, style: "Step", stepLabel: { en: "STEP 3", cn: "切割机翼" }, illustration: "illustrations/04_cut.png",        sceneType: "Cut" },
+  { key: "05_glue",        text: "第四步，胶水涂抹接缝，机翼和机身粘成一体。",                                emphasis: ["胶水粘合", "粘成一体"],                          voiceSec: 4.80, minDur: 5.0, style: "Step", stepLabel: { en: "STEP 4", cn: "粘合机身" }, illustration: "illustrations/05_glue.png",       sceneType: "Glue" },
+  { key: "06_motor",       text: "第五步，电机卡进机头，拧紧螺丝，固定死。",                                 emphasis: ["电机卡进机头", "拧紧螺丝"],                      voiceSec: 4.68, minDur: 5.0, style: "Step", stepLabel: { en: "STEP 5", cn: "安装电机" }, illustration: "illustrations/06_motor.png",      sceneType: "Motor" },
+  { key: "07_prop",        text: "第六步，螺旋桨卡到电机轴上，顺时针锁紧。",                                 emphasis: ["螺旋桨锁紧", "顺时针"],                          voiceSec: 4.66, minDur: 5.0, style: "Step", stepLabel: { en: "STEP 6", cn: "装螺旋桨" }, illustration: "illustrations/07_prop.png",       sceneType: "Prop" },
+  { key: "08_wire",        text: "第七步，电调和电池接好，正负极千万别接反。",                                emphasis: ["正负极", "千万别接反"],                          voiceSec: 4.80, minDur: 5.0, style: "Step", stepLabel: { en: "STEP 7", cn: "接电调电池" }, illustration: "illustrations/08_wire.png",     sceneType: "Wire" },
+  { key: "09_balance",     text: "第八步，调整重心，机翼微微上扬，飞机就稳了。",                              emphasis: ["调整重心", "微微上扬"],                          voiceSec: 4.80, minDur: 5.0, style: "Step", stepLabel: { en: "STEP 8", cn: "重心调试" }, illustration: "illustrations/09_balance.png",   sceneType: "Balance" },
+
+  { key: "10_countdown",   text: "三、二、一，发射！",                                                        emphasis: ["三、二、一", "发射"],                            voiceSec: 2.66, minDur: 3.0, style: "Counter", illustration: "illustrations/10_launch.png",      sceneType: "Launch" },
+
+  { key: "11_takeoff",     text: "模型飞机呼啸升空，整节课彻底燃起来了！",                                  emphasis: ["呼啸升空", "燃起来了"],                          voiceSec: 4.10, minDur: 5.5, style: "Caption", useRealVideo: true, videoSrc: "pexels/airport_takeoff.mp4", sceneType: "RealVideo" },
+  { key: "12_soaring",     text: "高空俯瞰，全班都在欢呼，评论区告诉我你的下一架航模。",                    emphasis: ["高空俯瞰", "评论区告诉我"],                      voiceSec: 5.40, minDur: 5.5, style: "Caption", useRealVideo: true, videoSrc: "pexels/drone_view1.mp4", sceneType: "RealVideo" },
+
+  { key: "13_endcard",     text: "点赞收藏，跟着我下期教你做更大、更远的遥控航模！",                          emphasis: ["点赞收藏", "遥控航模"],                          voiceSec: 5.16, minDur: 5.5, style: "End", illustration: "illustrations/13_endcard.png", sceneType: "End" },
 ];
 
 export const FPS = 30;
@@ -70,4 +76,3 @@ export function sceneFrameRange(idx: number): { start: number; duration: number 
   for (let i = 0; i < idx; i++) start += sceneFrames(SCENES[i]);
   return { start, duration: sceneFrames(SCENES[idx]) };
 }
-

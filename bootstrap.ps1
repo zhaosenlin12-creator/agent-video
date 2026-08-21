@@ -1,9 +1,9 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
-  Agent Video 一键环境准备 + 渲染示例
+  Agent Video 一键环境准备 + 渲染样例
 .DESCRIPTION
-  自动安装 npm + pip 依赖，验证 ffmpeg 可用，然后渲染示例视频。
+  自动检查 Node / Python / ffmpeg / Pillow / edge-tts，然后 npm install + 渲染航模样例视频。
   失败会立即停下并给出修复建议。
 .NOTES
   用法: powershell -NoProfile -ExecutionPolicy Bypass -File .\bootstrap.ps1
@@ -18,7 +18,7 @@ Write-Host "Root: $root"
 Write-Host ""
 
 # 1. 检查 Node / npm / python / ffmpeg
-function Require($name, $cmd, $minVer) {
+function Require($name, $cmd) {
   Write-Host -NoNewline "[CHECK] $name ... "
   try {
     $ver = & $cmd 2>&1 | Select-Object -First 1
@@ -30,23 +30,25 @@ function Require($name, $cmd, $minVer) {
 }
 
 $ok = $true
-$ok = (Require "Node.js (>=20)" { node --version }) -and $ok
-$ok = (Require "npm"            { npm --version }) -and $ok
-$ok = (Require "Python (>=3.10)" { python --version }) -and $ok
-$ok = (Require "ffmpeg"          { ffmpeg -version }) -and $ok
-$ok = (Require "ffprobe"         { ffprobe -version }) -and $ok
-$ok = (Require "ffplay"          { ffplay -version }) -and $ok
+$ok = (Require "Node.js (>=20)"     { node --version })    -and $ok
+$ok = (Require "npm"                { npm --version })     -and $ok
+$ok = (Require "Python (>=3.10)"    { python --version })  -and $ok
+$ok = (Require "ffmpeg"             { ffmpeg -version })   -and $ok
+$ok = (Require "ffprobe"            { ffprobe -version })  -and $ok
+$ok = (Require "ffplay"             { ffplay -version })   -and $ok
 
 if (-not $ok) {
   Write-Host ""
   Write-Host "Some prerequisites missing. Install them first:" -ForegroundColor Red
-  Write-Host "  Node 20+   : https://nodejs.org/"
+  Write-Host "  Node 20+    : https://nodejs.org/"
   Write-Host "  Python 3.10+: https://www.python.org/"
-  Write-Host "  ffmpeg 6.x : https://www.gyan.dev/ffmpeg/builds/ (add to PATH)"
+  Write-Host "  ffmpeg 6.x  : https://www.gyan.dev/ffmpeg/builds/ (add to PATH)"
+  Write-Host "  Pillow      : pip install pillow"
+  Write-Host "  edge-tts    : pip install edge-tts"
   exit 1
 }
 
-# 2. 安装 Python 包
+# 2. 安装 Python 库
 Write-Host ""
 Write-Host "[STEP] pip install pillow edge-tts" -ForegroundColor Cyan
 pip install --quiet pillow edge-tts 2>&1 | Select-Object -Last 5
@@ -61,13 +63,13 @@ try {
   Pop-Location
 }
 
-# 4. 渲染示例
+# 4. 渲染样例（航模搭建）
 Write-Host ""
-Write-Host "[STEP] npm run build-h264 (示例: 水火箭)" -ForegroundColor Cyan
+Write-Host "[STEP] npm run build-h264 (样例: 航模搭建)" -ForegroundColor Cyan
 Write-Host "    This takes ~85 seconds for the h264 final render." -ForegroundColor Yellow
 Push-Location $root
 try {
-  npm run build-h264 2>&1 | Select-Object -Last 20
+  npm run build-h264 2>&1 | Select-Object -Last 10
 } finally {
   Pop-Location
 }
@@ -81,3 +83,4 @@ Write-Host ""
 Write-Host "=== Bootstrap complete ===" -ForegroundColor Cyan
 Write-Host "Sample MP4: $root\out\water-rocket-h264.mp4"
 Write-Host "Edit src\data.ts to make your own video, then re-run:  npm run build-h264"
+Write-Host "Full docs in docs\TUTORIAL.md"

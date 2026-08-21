@@ -1,6 +1,6 @@
 ---
 name: knowledge-short-video-pipeline
-description: 一键生成 1080x1920 / 30fps / h264 crf 16 高质量抖音竖屏短视频。包含 8 个阶段：内容结构化 → PIL 干净 PNG 插画 → edge-tts 中文旁白 → Pexels CC0 真实视频 → Remotion 组件实现 → preview 快速验证 → 抽帧 + 一键 QA 验收 → h264 抖音上传成片。适用于：80-160 字的科普/教程/实验/步骤说明类短视频，每条 40-70s，含 Hook + 3-7 个 Step + 倒计时 + 真实素材片段 + EndCard。已用水火箭（13 场景 / 52s）实战验证 QA 19/19 全通过。
+description: 一键生成 1080x1920 / 30fps / h264 crf 17 高质量抖音竖屏短视频。包含 8 个阶段：内容结构化 → PIL 干净 PNG 插画 → edge-tts 中文旁白 → Pexels CC0 真实视频 → Remotion 组件实现 → preview 快速验证 → 抽帧 + 一键 QA 验收 → h264 抖音上传成片。适用于：80-160 字的科普/教程/实验/步骤说明类短视频，每条 40-70s，含 Hook + 8 个 Step + 倒计时 + 2 段真实视频 + EndCard + 倒计时 + 真实素材片段 + EndCard。已用水火箭（13 场景 / 52s）实战验证 QA 9/9 全通过。
 metadata:
   short-description: Remotion + PIL + edge-tts + Pexels pipeline for vertical Douyin knowledge videos
 ---
@@ -48,7 +48,7 @@ Everything else (palette, fonts, animation timing, Ken Burns, TTS voice, BGM vol
 
 ```
 deliver/
-├── <theme>_remotion_抖音竖屏超清.mp4     # 1080x1920 / 30fps / h264 crf 16 / 40-70s / ≤50MB
+├── <theme>_remotion_抖音竖屏超清.mp4     # 1080x1920 / 30fps / h264 crf 17 / 40-70s / ≤50MB
 └── <theme>_成片_抽帧样张.jpg            # 4x3 contact sheet
 ```
 
@@ -188,7 +188,7 @@ Always animate on at least 3 properties per Step scene (opacity + transform + se
 "scripts": {
   "start": "remotion studio",
   "build-preview": "remotion render WaterRocketDouyin out/preview.mp4 --concurrency 1 --jpeg-quality 80",
-  "build-h264": "remotion render WaterRocketDouyin out/water-rocket-h264.mp4 --codec h264 --crf 16",
+  "build-h264": "remotion render WaterRocketDouyin out/water-rocket-h264.mp4 --codec h264 --crf 17",
   "build-still": "remotion still WaterRocketDouyin out/poster.png --frame=120"
 }
 ```
@@ -197,7 +197,7 @@ Phase order:
 
 1. **Studio** (`npm run start`) — tweak animations live in browser
 2. **Preview** (`npm run build-preview`, ~2 min, jpeg, ~38MB) — verify content / timing
-3. **Final** (`npm run build-h264`, ~85s, h264 crf 16, ~38MB) — the deliverable
+3. **Final** (`npm run build-h264`, ~85s, h264 crf 17, ~38MB) — the deliverable
 
 ### Stage 7 - Quality gates (QA_CHECKLIST.md § 6)
 
@@ -260,7 +260,7 @@ Time budget: ~3 hours for first new topic (palette + PNG redraws dominate). ~1 h
 ## Reference project
 
 - Path: `D:\kaifa-teacher\moneyprinter\video_build\remotion\`
-- Sample deliverable: `D:\kaifa-teacher\moneyprinter\deliver\水火箭_学生实拍_remotion_抖音竖屏超清.mp4` (52s, 38MB, h264 crf 16, QA 19/19)
+- Sample deliverable: `D:\kaifa-teacher\moneyprinter\deliver\水火箭_学生实拍_remotion_抖音竖屏超清.mp4` (52s, 38MB, h264 crf 17, QA 9/9)
 - Reference docs (full SOP / tutorial / QA) sit in the same project folder:
   - `SOP.md`
   - `TUTORIAL.md`
@@ -269,4 +269,4 @@ Time budget: ~3 hours for first new topic (palette + PNG redraws dominate). ~1 h
 
 ## Version
 
-- v1.0 (2026-08-20) — water-rocket 13-scene production validation, QA 19/19 pass
+- v1.0 (2026-08-20) — water-rocket 13-scene production validation, QA 9/9 pass

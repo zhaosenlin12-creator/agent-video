@@ -9,9 +9,9 @@ npm-debug.log*
 
 # Build outputs (re-generate locally with `npm run build-h264`)
 out/
-*.mp4
-*.mov
-*.webm
+# *.mp4 (allow public/pexels/*.mp4)
+# *.mov
+# *.webm
 
 # QA 中间产物 (qa_check.ps1 验过就行，contact sheet 也不需要入库)
 qa/sheet/

@@ -1,100 +1,65 @@
-﻿import React from "react";
-import { interpolate, useCurrentFrame, spring, Easing, Img } from "remotion";
+import React from "react";
+import { interpolate, useCurrentFrame, spring, Easing, Img, staticFile } from "remotion";
 import { Stage } from "../components/Stage";
 import { StepLabel } from "../components/StepLabel";
 import { Caption } from "../components/Caption";
 
-// Each labelled material appears in sync with the narrator;
-// callouts "fly in" from off-screen, then settle in a grid.
-const COORDS: Array<{ x: number; y: number; w: number; h: number; label: string; delay: number; color: string }> = [
-  { x: 160, y: 720, w: 230, h: 380, label: "可乐瓶", delay: 0, color: "#a7d6ff" },
-  { x: 470, y: 760, w: 220, h: 220, label: "胶带", delay: 14, color: "#f3d34a" },
-  { x: 740, y: 760, w: 220, h: 170, label: "剪刀", delay: 28, color: "#dadde6" },
-  { x: 530, y: 1020, w: 180, h: 420, label: "打气筒", delay: 42, color: "#ffffff" },
-];
-
-export const MaterialsScene: React.FC<{ text: string; emphasis: string[]; stepEn: string; stepCn: string }> = ({ text, emphasis, stepEn, stepCn }) => {
+// MaterialsScene: 6 material items pop up one by one with bouncy entrance + name tag.
+export const MaterialsScene: React.FC<{ text: string; emphasis: string[]; stepEn: string; stepCn: string; illustration: string }> = ({ text, emphasis, stepEn, stepCn, illustration }) => {
   const f = useCurrentFrame();
   const fps = 30;
+  const scale = interpolate(f, [0, 130], [1.0, 1.06]);
+
+  // 6 materials appear one by one (every 12 frames)
+  const items = [
+    { name: "泡沫板", color: "#F5F5F5", icon: "📦" },
+    { name: "电机", color: "#FFD400", icon: "⚙" },
+    { name: "螺旋桨", color: "#E94B3C", icon: "✈" },
+    { name: "电池", color: "#3a7", icon: "🔋" },
+    { name: "胶水", color: "#FFF8E5", icon: "🧴" },
+    { name: "刻刀", color: "#C0C0C0", icon: "🔪" },
+  ];
+
   return (
     <Stage bg="#dee9f3">
-      <StepLabel en={stepEn} cn={stepCn} delay={0} />
-      <WoodBackground />
-      {COORDS.map((c, i) => {
-        const s = spring({ frame: f - c.delay, fps, config: { damping: 14, stiffness: 130, mass: 0.6 } });
-        const y = interpolate(s, [0, 1], [800, c.y]);
-        const op = interpolate(s, [0, 1], [0, 1]);
-        const rot = interpolate(s, [0, 1], [i % 2 ? -8 : 8, 0]);
+      <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+        <Img src={staticFile(illustration)} style={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%", objectFit: "cover", transform: `scale(${scale})` }} />
+      </div>
+
+      {/* StepLabel disabled (banner already in illustration) */}
+
+      {/* 6 materials grid 2x3 */}
+      {items.map((item, i) => {
+        const enter = Math.max(0, f - 8 - i * 10);
+        const op = interpolate(enter, [0, 10], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+        const bounce = spring({ frame: enter, fps, config: { damping: 8, stiffness: 200, mass: 0.5 } });
+        const col = i % 3;
+        const row = Math.floor(i / 3);
+        const x = 100 + col * 290;
+        const y = 800 + row * 220;
         return (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              left: c.x,
-              top: y,
-              width: c.w,
-              height: c.h,
-              opacity: op,
-              transform: `rotate(${rot}deg)`,
-              transformOrigin: "50% 100%",
-            }}
-          >
-            <Bottle color={c.color} label={c.label} />
+          <div key={i} style={{
+            position: "absolute",
+            left: x, top: y,
+            width: 240, height: 180,
+            background: item.color,
+            border: "4px solid #222",
+            borderRadius: 16,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: op,
+            transform: `scale(${bounce})`,
+            boxShadow: "0 6px 0 rgba(0,0,0,0.3)",
+          }}>
+            <div style={{ fontSize: 64, color: "#222" }}>{item.icon}</div>
+            <div style={{ fontSize: 36, fontWeight: 900, color: "#222", marginTop: 8 }}>{item.name}</div>
           </div>
         );
       })}
-      <Caption text={text} emphasis={emphasis} bottom={210} fadeIn={10} size={70} />
+
+      <Caption text={text} emphasis={emphasis} bottom={160} fadeIn={10} size={56} />
     </Stage>
   );
 };
-
-const WoodBackground: React.FC = () => (
-  <div
-    style={{
-      position: "absolute",
-      left: 60,
-      right: 60,
-      top: 600,
-      bottom: 360,
-      background: "#8a5a32",
-      border: "6px solid #4d2f17",
-      borderRadius: 12,
-      boxShadow: "inset 0 0 60px rgba(0,0,0,0.35)",
-    }}
-  />
-);
-
-const Bottle: React.FC<{ color: string; label: string }> = ({ color, label }) => {
-  return (
-    <div style={{ position: "relative", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div
-        style={{
-          width: "60%",
-          height: "75%",
-          background: color,
-          border: "4px solid #20324a",
-          borderRadius: 12,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: 8,
-          left: "10%",
-          right: "10%",
-          textAlign: "center",
-          fontSize: 38,
-          fontWeight: 800,
-          color: "#152238",
-          background: "#fff",
-          border: "3px solid #20324a",
-          padding: "4px 8px",
-          borderRadius: 6,
-        }}
-      >
-        {label}
-      </div>
-    </div>
-  );
-};
-
