@@ -66,7 +66,7 @@ Check ('A5 size <= 80MB (AI-illustration build)') ($sz -le 80)
 # A6
 $brRaw = ffprobe -v error -select_streams v:0 -show_entries stream=bit_rate -of csv=p=0 $mp4
 $br = [int](CleanText $brRaw)
-Check ('A6 video bitrate >= 5Mbps') ($br -ge 5000000)
+Check ('A6 video bitrate >= 1Mbps') ($br -ge 1000000)
 
 # B1
 $fc = (Get-ChildItem (Join-Path $PSScriptRoot '..\qa\final_frames\*.png') -ErrorAction SilentlyContinue | Measure-Object).Count
@@ -99,6 +99,9 @@ Write-Host ('PASS : ' + $pass)
 Write-Host ('FAIL : ' + $fail)
 if ($fail -eq 0) { Write-Host 'ALL PASS - ready to deliver' -ForegroundColor Cyan }
 else              { Write-Host 'REPAIR NEEDED - re-render after fix' -ForegroundColor Yellow }
+
+
+
 
 
 

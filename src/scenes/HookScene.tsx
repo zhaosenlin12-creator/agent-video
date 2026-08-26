@@ -1,167 +1,186 @@
 ﻿import React from "react";
-import { interpolate, useCurrentFrame, Easing, Img, staticFile, AbsoluteFill } from "remotion";
-import { Stage } from "../components/Stage";
-import { HookHeadline } from "../components/HookHeadline";
-import { Caption } from "../components/Caption";
+import { useCurrentFrame, Img, staticFile, interpolate } from "remotion";
+import { elementStyle } from "../components/motion";
+import type { SceneElement } from "../data";
 
-const W = 1080;
-const H = 1920;
-
-// Beat-cut-moves (A式: 递进硬切串) implementation:
-// - Build phase 0-49f: wide establishing shot with subtle zoom
-// - 5 hard cuts at intervals 16→12→8→6→4 (frames 49, 65, 77, 85, 91, 95)
-// - Each cut: 1f brightness flash + 6% white overlay (shutter click, not full flash)
-// - Hold 95-end: wide hero with main headline reveal (R1 ≥1s hold)
-const CUT_FRAMES = [49, 65, 77, 85, 91, 95];
-
-// View index per cut: 0=wide, 1=cut1, 2=cut2, 3=cut3, 4=cut4, 5=wide again
-const VIEWS_AT_FRAMES = (cutCount: number) => {
-  // cutCount = number of intermediate views (here 5)
-  const arr: number[] = [];
-  for (let i = 0; i < cutCount; i++) arr.push(i + 1);
-  arr.push(0); // back to wide
-  return arr;
-};
-
-export const HookScene: React.FC<{
-  text: string;
-  emphasis: string[];
-  illustration: string;
-  hookCuts: string[];
-}> = ({ text, emphasis, illustration, hookCuts }) => {
+// Hook Scene: 节奏感 hook，开场视觉冲击
+// 设计：纯色背景 + 大字弹性入场 + 恐龙图 axial-flyin + 副标
+// 总时长 ~5s = 150f，节奏卡点
+export const HookScene: React.FC = () => {
   const f = useCurrentFrame();
-  const cuts = hookCuts && hookCuts.length > 0 ? hookCuts : [];
-  const viewOrder = VIEWS_AT_FRAMES(cuts.length);
 
-  // Find current view based on cut frames
-  let viewIdx = 0;
-  for (let i = 0; i < CUT_FRAMES.length; i++) {
-    if (f >= CUT_FRAMES[i]) viewIdx = i + 1;
-  }
+  // 主元素按节奏入场
+  // 0-15: 大字"一节课打印"弹性入场（spring-rise）
+  // 4-19: 大字"只活恐龙" 弹性入场
+  // 14-29: 恐龙图 axial-flyin 从右侧飞入
+  // 24-39: 副标题"课间直接炸了！" 弹性入场
+  // 30-45: 底部提示 渐入
+  // 45+: 全部静止 hold
 
-  // Determine current image + transform
-  const isWide = viewIdx === 0 || viewIdx === viewOrder.length;
-  const currentImg = isWide ? illustration : cuts[viewIdx - 1] || illustration;
-
-  // Transform per cut view (each cut has a different scale + transform-origin to feel like different camera)
-  const viewTransforms: Array<{ scale: number; ox: string; oy: string }> = [
-    { scale: 1.0, ox: "center", oy: "center" }, // wide
-    { scale: 2.0, ox: "30% 60%", oy: "top" },
-    { scale: 2.0, ox: "70% 40%", oy: "top" },
-    { scale: 2.0, ox: "30% 70%", oy: "bottom" },
-    { scale: 2.2, ox: "center 80%", oy: "bottom" },
-    { scale: 2.0, ox: "center 50%", oy: "center" },
-  ];
-  const tx = viewTransforms[viewIdx] || viewTransforms[0];
-
-  // Build-phase subtle scale (0-49f)
-  const buildScale = interpolate(f, [0, 49], [1.0, 1.06], { extrapolateRight: "clamp" });
-  // Hold-phase subtle scale (95-end)
-  const holdScale = interpolate(f, [95, 135], [1.06, 1.10], { extrapolateRight: "clamp" });
-
-  // Decide final scale based on phase
-  let finalScale = tx.scale;
-  if (isWide) {
-    finalScale = f < 49 ? buildScale : f < 95 ? 1.06 : holdScale;
-  }
-
-  // Cut flash (1f brightness boost + 6% white overlay at exact cut frame)
-  const onCutFrame = CUT_FRAMES.some(cf => f === cf);
-  const flashBrightness = onCutFrame ? 1.06 : 1.0;
-  const flashOpacity = onCutFrame ? 0.06 : 0.0;
-
-  // Reveal mask during build (revealing from center outward)
-  const revealR = interpolate(f, [0, 49], [0, 800], { extrapolateRight: "clamp" });
-
-  // Stars overlay (only in wide phase)
-  const stars = Array.from({ length: 18 });
-
-  // Headline reveal: starts at frame 95 (after cuts land)
-  const headlineScale = interpolate(f, [95, 110], [0.6, 1.0], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.bezier(0.2, 1.25, 0.3, 1) });
+  // 背景缩放呼吸
+  const bgScale = interpolate(f, [0, 150], [1.0, 1.06]);
 
   return (
-    <Stage bg="#0a0c14">
-      <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
-        <Img
-          src={staticFile(currentImg)}
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            transform: `scale(${finalScale})`,
-            transformOrigin: `${tx.ox} ${tx.oy}`,
-            filter: `brightness(${flashBrightness})`,
-          }}
-        />
-      </div>
-
-      {/* Cut flash overlay (subtle white at exact cut frame) */}
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        background: "#0a0c14",
+        overflow: "hidden",
+        fontFamily: "Microsoft YaHei, PingFang SC, sans-serif",
+      }}
+    >
+      {/* Grid bg */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          background: "white",
-          opacity: flashOpacity,
+          backgroundImage:
+            "linear-gradient(rgba(255,212,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,212,0,0.05) 1px, transparent 1px)",
+          backgroundSize: "50px 50px",
+        }}
+      />
+      {/* 中心光晕 */}
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "55%",
+          translate: "-50% -50%",
+          width: 1600,
+          height: 1600,
+          background: "radial-gradient(circle, rgba(255,212,0,0.18) 0%, transparent 55%)",
           pointerEvents: "none",
         }}
       />
 
-      {/* Vignette during build */}
-      {f < 95 && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.45) 100%)",
-            pointerEvents: "none",
-          }}
-        />
-      )}
+      {/* 速度辐射线（背景动效） */}
+      <svg width="1080" height="1920" viewBox="0 0 1080 1920" style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+        {Array.from({ length: 16 }).map((_, i) => {
+          const angle = (i / 16) * Math.PI * 2;
+          const r1 = 200;
+          const r2 = 900;
+          const x1 = 540 + Math.cos(angle) * r1;
+          const y1 = 1100 + Math.sin(angle) * r1;
+          const x2 = 540 + Math.cos(angle) * r2;
+          const y2 = 1100 + Math.sin(angle) * r2;
+          return (
+            <line
+              key={i}
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke="#FFD400"
+              strokeWidth="3"
+              strokeDasharray="40 60"
+              opacity={0.3}
+              style={{
+                strokeDashoffset: interpolate(f, [0, 150], [0, -300]),
+                transform: `rotate(${interpolate(f, [0, 150], [0, 20])}deg)`,
+                transformOrigin: "540px 1100px",
+              }}
+            />
+          );
+        })}
+      </svg>
 
-      {/* Stars overlay (wide phase only) */}
-      {isWide && stars.map((_, i) => {
-        const sx = (i * 137) % (W - 40) + 20;
-        const sy = (i * 211) % (H - 80) + 40;
-        const tw = 0.4 + Math.abs(Math.sin(f * 0.15 + i)) * 0.6;
-        return (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              left: sx,
-              top: sy,
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: "#FFD400",
-              opacity: tw * 0.6,
-              boxShadow: "0 0 12px rgba(255,212,0,0.8)",
-            }}
-          />
-        );
-      })}
-
-      {/* Headline: only show after cut sequence lands (frame 95+) - this is the "1s hold" */}
-      {f >= 95 && (
-        <div style={{
+      {/* 主标题行 1: 一节课打印 */}
+      <div
+        style={{
+          ...elementStyle({ f, delay: 0, entrance: "spring-rise", fromY: 80, duration: 14 }),
           position: "absolute",
-          top: 200,
-          left: 0,
-          right: 0,
-          textAlign: "center",
-          transform: `scale(${headlineScale})`,
-        }}>
-          <HookHeadline text={text} />
-        </div>
-      )}
+          left: "50%",
+          top: 280,
+          translate: "-50% 0",
+          fontSize: 130,
+          color: "#FFD400",
+          fontWeight: 900,
+          textShadow: "0 6px 0 rgba(0,0,0,0.6), 0 0 30px rgba(255,212,0,0.7)",
+          WebkitTextStroke: "4px #B81F1F",
+          whiteSpace: "nowrap",
+          letterSpacing: "0.08em",
+        }}
+      >
+        一节课打印
+      </div>
 
-      {/* Caption appears during hold */}
-      {f >= 100 && (
-        <Caption text="全班都围过来了，点击看完整实验过程" emphasis={["全班"]} bottom={140} fadeIn={100} size={56} />
-      )}
-    </Stage>
+      {/* 主标题行 2: 只活恐龙 */}
+      <div
+        style={{
+          ...elementStyle({ f, delay: 4, entrance: "spring-rise", fromY: 80, duration: 14 }),
+          position: "absolute",
+          left: "50%",
+          top: 450,
+          translate: "-50% 0",
+          fontSize: 140,
+          color: "#FFD400",
+          fontWeight: 900,
+          textShadow: "0 6px 0 rgba(0,0,0,0.6), 0 0 40px rgba(255,212,0,0.9)",
+          WebkitTextStroke: "4px #B81F1F",
+          whiteSpace: "nowrap",
+          letterSpacing: "0.08em",
+        }}
+      >
+        只活恐龙
+      </div>
+
+      {/* 恐龙图 axial-flyin 从右侧 */}
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: 1150,
+          translate: "-50% -50%",
+          width: 800,
+          height: 800,
+          ...elementStyle({ f, delay: 14, entrance: "axial-flyin", fromX: 1200, fromY: 200, duration: 18 }),
+          filter: "drop-shadow(0 12px 24px rgba(0,0,0,0.5))",
+        }}
+      >
+        <Img
+          src={staticFile("illustrations/01_hook.png")}
+          style={{ width: "100%", height: "100%", objectFit: "contain" }}
+        />
+      </div>
+
+      {/* 副标题：课间直接炸了！ */}
+      <div
+        style={{
+          ...elementStyle({ f, delay: 24, entrance: "spring-rise", fromY: 60, duration: 14 }),
+          position: "absolute",
+          left: "50%",
+          top: 1620,
+          translate: "-50% 0",
+          fontSize: 90,
+          color: "#FFFFFF",
+          fontWeight: 900,
+          textShadow: "0 4px 0 rgba(0,0,0,0.6), 0 0 20px rgba(255,212,0,0.5)",
+          background: "rgba(15,16,24,0.85)",
+          padding: "16px 32px",
+          borderRadius: 16,
+          borderLeft: "6px solid #FFD400",
+        }}
+      >
+        课间直接炸了！
+      </div>
+
+      {/* 底部小提示 */}
+      <div
+        style={{
+          ...elementStyle({ f, delay: 30, entrance: "fade", duration: 14 }),
+          position: "absolute",
+          left: "50%",
+          top: 1820,
+          translate: "-50% 0",
+          fontSize: 50,
+          color: "#FFD400",
+          fontWeight: 700,
+          textShadow: "0 2px 0 rgba(0,0,0,0.5)",
+        }}
+      >
+        全班同学都看呆了 · 点击看完整实验
+      </div>
+    </div>
   );
 };
