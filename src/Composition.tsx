@@ -28,8 +28,8 @@ const SceneRenderer: React.FC<{ idx: number }> = ({ idx }) => {
     illustration: s.illustration ? s.illustration : "",
   };
   switch (s.sceneType) {
-    case "Hook":
-      return <HookScene text={s.text} emphasis={s.emphasis} />;
+    case "Hook": return <HookScene text={s.text} emphasis={s.emphasis} illustration={s.illustration ? s.illustration : ""} hookCuts={s.hookCuts ? s.hookCuts : []} />;
+
     case "Materials":
       return <MaterialsScene {...stepProps} />;
     case "Draw":
@@ -52,8 +52,8 @@ const SceneRenderer: React.FC<{ idx: number }> = ({ idx }) => {
       return <CountdownScene number={s.counterNumber ? s.counterNumber : ""} />;
     case "RealVideo":
       return <RealVideoScene text={s.text} emphasis={s.emphasis} videoSrc={s.videoSrc ? s.videoSrc : ""} />;
-    case "End":
-      return <EndCardScene text={s.text} emphasis={s.emphasis} />;
+    case "End": return <EndCardScene text={s.text} emphasis={s.emphasis} illustration={s.illustration ? s.illustration : ""} flashCuts={s.flashCuts ? s.flashCuts : []} />;
+
     default:
       return <StepScene {...stepProps} />;
   }
@@ -74,3 +74,5 @@ export const Composition: React.FC = () => {
     </AbsoluteFill>
   );
 };
+
+

@@ -5,7 +5,7 @@
   "scripts": {
     "start": "remotion studio",
     "build": "remotion render WaterRocketDouyin out/water-rocket.mp4",
-    "build-h264": "remotion render WaterRocketDouyin out/water-rocket-h264.mp4 --codec h264 --crf 16",
+    "build-h264": "remotion render WaterRocketDouyin out/water-rocket-h264.mp4 --codec h264 --crf 17",
     "build-preview": "remotion render WaterRocketDouyin out/preview.mp4 --concurrency 1 --jpeg-quality 80",
     "build-still": "remotion still WaterRocketDouyin out/poster.png --frame=120",
     "upgrade": "remotion upgrade"

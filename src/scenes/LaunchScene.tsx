@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { interpolate, useCurrentFrame, spring, Easing, Img, staticFile } from "remotion";
 import { Stage } from "../components/Stage";
 import { CounterNumber } from "../components/CounterNumber";
@@ -13,7 +13,7 @@ export const LaunchScene: React.FC<{ text: string; emphasis: string[]; illustrat
   let number = "3";
   if (f >= 20 && f < 40) number = "2";
   else if (f >= 40 && f < 60) number = "1";
-  else if (f >= 60) number = "🚀";
+  else if (f >= 60) number = "馃殌";
 
   // Number bounce
   const numScale = spring({ frame: f % 20, fps, config: { damping: 8, stiffness: 220, mass: 0.5 } });
@@ -51,25 +51,6 @@ export const LaunchScene: React.FC<{ text: string; emphasis: string[]; illustrat
         <Img src={staticFile(illustration)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.55 }} />
       </div>
 
-      {/* Plane flying upward after launch */}
-      {f >= 60 && (
-        <div style={{
-          position: "absolute",
-          left: 400, top: 1200 + planeY,
-          zIndex: 5,
-          transform: `rotate(-30deg)`,
-        }}>
-          <svg width="280" height="120" viewBox="0 0 280 120">
-            <polygon points="140,60 280,40 280,80" fill="#E94B3C" stroke="#222" strokeWidth="3" />
-            <polygon points="140,60 0,40 0,80" fill="#E94B3C" stroke="#222" strokeWidth="3" />
-            <ellipse cx="140" cy="60" rx="120" ry="18" fill="#FFD400" stroke="#222" strokeWidth="3" />
-            <ellipse cx="30" cy="60" rx="20" ry="14" fill="#FFD400" stroke="#222" strokeWidth="3" />
-            {/* Flame trail */}
-            <polygon points="30,60 0,40 -40,55 0,70 0,80" fill="#FFD400" opacity="0.95" />
-            <polygon points="20,60 -10,45 -50,60 -10,75" fill="#FF6B00" opacity="0.85" />
-          </svg>
-        </div>
-      )}
 
       {/* Shockwave ring */}
       <div style={{
@@ -112,7 +93,7 @@ export const LaunchScene: React.FC<{ text: string; emphasis: string[]; illustrat
           WebkitTextStroke: "8px #000",
           transform: `scale(${numScale})`,
         }}>
-          🚀
+          馃殌
         </div>
       )}
 
@@ -129,3 +110,4 @@ export const LaunchScene: React.FC<{ text: string; emphasis: string[]; illustrat
     </Stage>
   );
 };
+
