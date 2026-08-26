@@ -66,7 +66,7 @@ export const SCENES: SceneDef[] = [
     elements: [
       { id: "headline", kind: "title", entrance: "spring-rise", delay: 0, text: "一节课打印", textColor: "#FFD400", textSize: 130, highlight: true, x: "50%", y: 380 },
       { id: "headline-2", kind: "title", entrance: "spring-rise", delay: 6, text: "只活恐龙", textColor: "#FFD400", textSize: 130, highlight: true, x: "50%", y: 540 },
-      { id: "dino", kind: "image", src: "illustrations/01_hook.png", entrance: "axial-flyin", delay: 14, scale: 1.0, x: "50%", y: 1150 },
+      { id: "dino", kind: "image", src: "illustrations/01_hook.png", entrance: "axial-flyin", delay: 14, scale: 0.7, x: "50%", y: 1150 },
       { id: "cap", kind: "label", entrance: "fade", delay: 30, text: "全班同学都看呆了，点击看完整实验", textColor: "#FFD400", textSize: 52, x: "50%", y: 1700 },
     ],
     bgmBeatAt: 30,
@@ -107,7 +107,7 @@ export const SCENES: SceneDef[] = [
     stepLabel: { en: "STEP 2", cn: "三维建模" },
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 2 · 三维建模", textColor: "#FFD400", textSize: 56 },
-      { id: "head", kind: "image", src: "illustrations/03_model.png", entrance: "axial-flyin", delay: 6, scale: 0.85, x: 540, y: 850 },
+      { id: "head", kind: "image", src: "illustrations/03_model.png", entrance: "axial-flyin", delay: 6, scale: 0.65, x: 540, y: 850 },
       { id: "lbl-head", kind: "label", entrance: "spring-rise", delay: 22, text: "头部", textColor: "#FFD400", textSize: 60, x: 540, y: 380 },
       { id: "lbl-body", kind: "label", entrance: "spring-rise", delay: 30, text: "躯干", textColor: "#FFD400", textSize: 60, x: 540, y: 1000 },
       { id: "lbl-tail", kind: "label", entrance: "spring-rise", delay: 38, text: "尾巴", textColor: "#FFD400", textSize: 60, x: 540, y: 1280 },
@@ -131,7 +131,7 @@ export const SCENES: SceneDef[] = [
     stepLabel: { en: "STEP 3", cn: "切片路径" },
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 3 · 切片路径", textColor: "#FFD400", textSize: 56 },
-      { id: "screen", kind: "image", src: "illustrations/04_slice.png", entrance: "axial-flyin", delay: 8, scale: 0.85, x: 540, y: 900 },
+      { id: "screen", kind: "image", src: "illustrations/04_slice.png", entrance: "axial-flyin", delay: 8, scale: 0.65, x: 540, y: 900 },
       { id: "layers", kind: "line", entrance: "sweep", delay: 22 },
       { id: "info", kind: "label", entrance: "spring-rise", delay: 44, text: "200 层路径", textColor: "#FFD400", textSize: 86, highlight: true, x: 540, y: 1480 },
       { id: "cap", kind: "label", entrance: "fade", delay: 56, text: "层层堆叠成型", textColor: "#FFFFFF", textSize: 50, x: 540, y: 1700 },
@@ -151,7 +151,7 @@ export const SCENES: SceneDef[] = [
     stepLabel: { en: "STEP 4", cn: "开始打印" },
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 4 · 开始打印", textColor: "#FFD400", textSize: 56 },
-      { id: "printer", kind: "image", src: "illustrations/05_print.png", entrance: "axial-flyin", delay: 8, scale: 0.95, x: 540, y: 900 },
+      { id: "printer", kind: "image", src: "illustrations/05_print.png", entrance: "axial-flyin", delay: 8, scale: 0.655, x: 540, y: 900 },
       { id: "progress-bar", kind: "line", entrance: "sweep", delay: 38 },
       { id: "progress", kind: "label", entrance: "spring-pop", delay: 50, text: "78%", textColor: "#FFD400", textSize: 96, highlight: true, x: 540, y: 1480 },
       { id: "cap", kind: "label", entrance: "fade", delay: 60, text: "塑料一秒秒堆出来", textColor: "#FFFFFF", textSize: 50, x: 540, y: 1700 },
@@ -171,7 +171,7 @@ export const SCENES: SceneDef[] = [
     stepLabel: { en: "STEP 5", cn: "逐层堆叠" },
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 5 · 逐层堆叠", textColor: "#FFD400", textSize: 56 },
-      { id: "layer-img", kind: "image", src: "illustrations/06_layer.png", entrance: "axial-flyin", delay: 8, scale: 0.9, x: 540, y: 900 },
+      { id: "layer-img", kind: "image", src: "illustrations/06_layer.png", entrance: "axial-flyin", delay: 8, scale: 0.65, x: 540, y: 900 },
       { id: "layers", kind: "line", entrance: "sweep", delay: 22 },
       { id: "layer-count", kind: "label", entrance: "spring-pop", delay: 44, text: "120 层", textColor: "#FFD400", textSize: 96, highlight: true, x: 540, y: 1480 },
       { id: "cap", kind: "label", entrance: "fade", delay: 56, text: "肉眼可见在堆高", textColor: "#FFFFFF", textSize: 50, x: 540, y: 1700 },
@@ -191,7 +191,7 @@ export const SCENES: SceneDef[] = [
     stepLabel: { en: "STEP 6", cn: "取下成品" },
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 6 · 取下成品", textColor: "#FFD400", textSize: 56 },
-      { id: "part", kind: "image", src: "illustrations/07_remove.png", entrance: "axial-flyin", delay: 8, scale: 0.85, x: 540, y: 880 },
+      { id: "part", kind: "image", src: "illustrations/07_remove.png", entrance: "axial-flyin", delay: 8, scale: 0.65, x: 540, y: 880 },
       { id: "grip", kind: "line", entrance: "sweep", delay: 22 },
       { id: "twist", kind: "line", entrance: "sweep", delay: 34 },
       { id: "check", kind: "label", entrance: "spring-pop", delay: 52, text: "完成", textColor: "#FFD400", textSize: 96, highlight: true, x: 540, y: 1480 },
@@ -213,7 +213,7 @@ export const SCENES: SceneDef[] = [
     stepLabel: { en: "STEP 7", cn: "安装舵机" },
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 7 · 安装舵机", textColor: "#FFD400", textSize: 56 },
-      { id: "dino-body", kind: "image", src: "illustrations/08_servo.png", entrance: "fade", delay: 8, scale: 0.85, x: 540, y: 880 },
+      { id: "dino-body", kind: "image", src: "illustrations/08_servo.png", entrance: "fade", delay: 8, scale: 0.65, x: 540, y: 880 },
       { id: "servo", kind: "image", src: "illustrations/_aux_servo.png", entrance: "axial-flyin", delay: 22, scale: 0.4, x: 200, y: 480 },
       { id: "wire-1", kind: "line", entrance: "sweep", delay: 36 },
       { id: "wire-2", kind: "line", entrance: "sweep", delay: 42 },
@@ -239,7 +239,7 @@ export const SCENES: SceneDef[] = [
     stepLabel: { en: "STEP 8", cn: "写控制代码" },
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 8 · 写控制代码", textColor: "#FFD400", textSize: 56 },
-      { id: "screen", kind: "image", src: "illustrations/09_code.png", entrance: "fade", delay: 6, scale: 0.78, x: 540, y: 820 },
+      { id: "screen", kind: "image", src: "illustrations/09_code.png", entrance: "fade", delay: 6, scale: 0.62, x: 540, y: 820 },
       { id: "line-1", kind: "line", entrance: "sweep", delay: 20 },
       { id: "line-2", kind: "line", entrance: "sweep", delay: 28 },
       { id: "line-3", kind: "line", entrance: "sweep", delay: 36 },
@@ -263,7 +263,7 @@ export const SCENES: SceneDef[] = [
     sceneType: "Power",
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 9 · 通电测试", textColor: "#FFD400", textSize: 56 },
-      { id: "dino-off", kind: "image", src: "illustrations/10_power.png", entrance: "fade", delay: 6, scale: 0.85, x: 540, y: 900 },
+      { id: "dino-off", kind: "image", src: "illustrations/10_power.png", entrance: "fade", delay: 6, scale: 0.65, x: 540, y: 900 },
       { id: "counter", kind: "line", entrance: "sweep", delay: 16 },
       { id: "zap", kind: "line", entrance: "shutter", delay: 80 },
       { id: "cap", kind: "label", entrance: "fade", delay: 30, text: "尾巴立刻晃", textColor: "#FFFFFF", textSize: 50, x: 540, y: 1700 },
@@ -282,7 +282,7 @@ export const SCENES: SceneDef[] = [
   { key: "11_demo", text: "摆在桌上，冲你摇头摆尾。", emphasis: ["摇头摆尾"], voiceSec: 2.80, minDur: 3.5, style: "Caption",
     sceneType: "Demo",
     elements: [
-      { id: "dino", kind: "image", src: "illustrations/11_demo.png", entrance: "spring-rise", delay: 0, scale: 0.95, x: 540, y: 880 },
+      { id: "dino", kind: "image", src: "illustrations/11_demo.png", entrance: "spring-rise", delay: 0, scale: 0.655, x: 540, y: 880 },
       { id: "tail", kind: "line", entrance: "sweep", delay: 12 },
       { id: "head", kind: "line", entrance: "sweep", delay: 20 },
       { id: "tag", kind: "label", entrance: "spring-pop", delay: 30, text: "好可爱", textColor: "#FFD400", textSize: 110, highlight: true, x: 540, y: 1500 },
@@ -301,7 +301,7 @@ export const SCENES: SceneDef[] = [
   { key: "12_roar", text: "按下遥控，一声吼叫，全班都围过来。", emphasis: ["吼叫", "全班围过来"], voiceSec: 3.50, minDur: 5.5, style: "Caption",
     sceneType: "Roar",
     elements: [
-      { id: "dino", kind: "image", src: "illustrations/12_roar.png", entrance: "spring-rise", delay: 0, scale: 0.95, x: 540, y: 880 },
+      { id: "dino", kind: "image", src: "illustrations/12_roar.png", entrance: "spring-rise", delay: 0, scale: 0.655, x: 540, y: 880 },
       { id: "roar", kind: "line", entrance: "sweep", delay: 12 },
       { id: "wave", kind: "line", entrance: "sweep", delay: 22 },
       { id: "people", kind: "line", entrance: "sweep", delay: 36 },

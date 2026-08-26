@@ -119,7 +119,9 @@ export const ElementRenderer: React.FC<Props> = ({ el, frame }) => {
     }
 
     case "image": {
-      const w = (el.w ? el.w : 1080 * (el.scale || 0.65));
+      // 主图上限：宽度按 scale，高度按 9:16 比例自动算，但 hard cap 1080 防溢出
+      const w = (el.w ? el.w : Math.min(1080 * (el.scale || 0.65), 1000));
+      const h = el.h ? el.h : Math.min(w * 1.4, 1180);  // max height 1180，留出 y=200..1380 主体区
       // Post-entrance: subtle pulse/sway
       const entranceT = (f - el.delay) / 12;
       const postEntrance = entranceT > 1;
@@ -132,9 +134,11 @@ export const ElementRenderer: React.FC<Props> = ({ el, frame }) => {
             ...baseStyle,
             transform: combinedTransform,
             width: typeof w === "number" ? w : undefined,
+            height: h,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            overflow: "hidden",
           }}
         >
           <Img
