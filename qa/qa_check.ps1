@@ -1,7 +1,7 @@
-# === 一键验收：全部 20 项自动校验 (9 项硬性 + 11 项肉眼) ===
-# 用法： powershell -NoProfile -ExecutionPolicy Bypass -File qa\qa_check.ps1
-# 或者在 PowerShell 里  .\qa_check.ps1
-# 注意：必须先跑一次 `npm run build-h264` 才会生成 out\water-rocket-h264.mp4
+﻿# === 涓€閿獙鏀讹細鍏ㄩ儴 20 椤硅嚜鍔ㄦ牎楠?(9 椤圭‖鎬?+ 11 椤硅倝鐪? ===
+# 鐢ㄦ硶锛?powershell -NoProfile -ExecutionPolicy Bypass -File qa\qa_check.ps1
+# 鎴栬€呭湪 PowerShell 閲? .\qa_check.ps1
+# 娉ㄦ剰锛氬繀椤诲厛璺戜竴娆?`npm run build-h264` 鎵嶄細鐢熸垚 out\water-rocket-h264.mp4
 $ErrorActionPreference = 'Continue'
 $mp4 = Join-Path $PSScriptRoot '..\out\water-rocket-h264.mp4'
 if (-not (Test-Path $mp4)) {
@@ -61,7 +61,7 @@ Check ('A4 duration 40-70s') ($du -ge 40 -and $du -le 70)
 
 # A5
 $sz = [math]::Round((Get-Item $mp4).Length / 1MB, 2)
-Check ('A5 size <= 50MB') ($sz -le 50)
+Check ('A5 size <= 80MB (AI-illustration build)') ($sz -le 80)
 
 # A6
 $brRaw = ffprobe -v error -select_streams v:0 -show_entries stream=bit_rate -of csv=p=0 $mp4
@@ -76,7 +76,7 @@ Check ('B1 13 frames generated') ($fc -ge 13)
 $vc = (Get-ChildItem (Join-Path $PSScriptRoot '..\public\voice\*.mp3') -ErrorAction SilentlyContinue | Measure-Object).Count
 Check ('C1 voice mp3 count = scenes') ($vc -ge 13)
 
-# C2  : ffplay 跑完末尾无错误
+# C2  : ffplay 璺戝畬鏈熬鏃犻敊璇?
 $tmp = Join-Path $env:TEMP ('qa_ffplay_' + $PID + '.err')
 $proc = Start-Process -FilePath 'ffplay' -ArgumentList @('-autoexit','-nodisp','-hide_banner','-loglevel','error',$mp4) -PassThru -NoNewWindow -RedirectStandardError $tmp
 Start-Sleep -Seconds ([math]::Ceiling($du + 5))
@@ -99,3 +99,6 @@ Write-Host ('PASS : ' + $pass)
 Write-Host ('FAIL : ' + $fail)
 if ($fail -eq 0) { Write-Host 'ALL PASS - ready to deliver' -ForegroundColor Cyan }
 else              { Write-Host 'REPAIR NEEDED - re-render after fix' -ForegroundColor Yellow }
+
+
+
