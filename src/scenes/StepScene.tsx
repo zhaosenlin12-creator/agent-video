@@ -1,4 +1,4 @@
-﻿import React from "react";
+﻿﻿import React from "react";
 import { useCurrentFrame, interpolate } from "remotion";
 import type { SceneElement } from "../data";
 import { ElementRenderer } from "../components/ElementRenderer";
@@ -143,7 +143,7 @@ export const StepScene: React.FC<Props> = ({
           position: "absolute",
           left: 0,
           right: 0,
-          bottom: 110,
+          bottom: 270,
           textAlign: "center",
           opacity: captionOpacity,
           transform: `translateY(${captionY}px)`,
@@ -168,5 +168,6 @@ export const StepScene: React.FC<Props> = ({
     </div>
   );
 };
+
 
 

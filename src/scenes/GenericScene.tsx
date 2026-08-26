@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { useCurrentFrame } from "remotion";
 import type { SceneDef } from "../data";
 import { StepScene } from "./StepScene";
@@ -54,13 +54,18 @@ export const GenericScene: React.FC<{ scene: SceneDef }> = ({ scene }) => {
   const bgImg = getBackgroundImage(scene.sceneType);
 
   // 把 line 元素过滤掉（这些由 Overlay 渲染），保留其它元素
-  const elements = scene.elements.filter((el) => el.kind !== "line");
+  const filtered = scene.elements.filter((el) => el.kind !== "line");
 
-  // 找到 caption 元素（label 类型的，无 entrance=axial-flyin，无 src）
-  const captionEl = elements.find((el) => el.kind === "label" && !el.highlight && (el.textSize || 0) < 80);
+  // 找到 caption 元素（label 类型的，无 highlight，textSize < 80）
+  const captionEl = filtered.find((el) => el.kind === "label" && !el.highlight && (el.textSize || 0) < 80);
   const caption = captionEl?.text || scene.text;
   const captionEmphasis = scene.emphasis;
   const captionDelay = captionEl?.delay ?? 8;
+
+  // 把 captionEl 从 elements 中过滤掉，避免双重渲染（caption 由 StepScene 统一渲染）
+  const elements = captionEl
+    ? filtered.filter((el) => el !== captionEl)
+    : filtered;
 
   return (
     <StepScene
@@ -75,4 +80,3 @@ export const GenericScene: React.FC<{ scene: SceneDef }> = ({ scene }) => {
     />
   );
 };
-
