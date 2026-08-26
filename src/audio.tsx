@@ -5,10 +5,11 @@ import { SCENES, sceneFrameRange } from "./data";
 // SFX cue type mapping
 const sfxFile = (s: string): string | null => {
   switch (s) {
-    case "pop": return "sfx/pop.wav";
+    case "pop": return "sfx/click.wav";      // 复用 click 作为 pop 的轻量版本
     case "whoosh": return "sfx/whoosh.wav";
     case "click": return "sfx/click.wav";
     case "snap": return "sfx/snap.wav";
+    case "tick": return "sfx/click.wav";     // 入场轻量 tick
     case "riser": return "sfx/riser.wav";
     case "count": return "sfx/count_3.wav";
     case "power": return "sfx/power.wav";
@@ -16,7 +17,7 @@ const sfxFile = (s: string): string | null => {
   }
 };
 
-// 过渡音（whoosh/pop/click/snap）全部直接跳过不渲染，仅保留 count / riser / power
+// 过渡音（whoosh/pop/click/snap）全部直接跳过不渲染，仅保留 count / riser / power / tick
 const isTransition = (s: string) => ["whoosh", "pop", "click", "snap"].includes(s);
 
 export const AudioLayer: React.FC = () => {
@@ -35,7 +36,8 @@ export const AudioLayer: React.FC = () => {
         );
       })}
 
-      {/* SFX per scene cue - transition sounds (whoosh/pop/click/snap) are skipped entirely */}
+      {/* SFX per scene cue - transition sounds (whoosh/pop/click/snap) are skipped;
+          tick stays as soft entrance feedback at low volume */}
       {SCENES.map((s, sceneIdx) => {
         const { start } = sceneFrameRange(sceneIdx);
         const cues = (s.sfxCues || []).filter((cue) => !isTransition(cue.sound));
@@ -49,9 +51,13 @@ export const AudioLayer: React.FC = () => {
             else if (idx === 2) file = "sfx/count_1.wav";
           }
           if (!file) return null;
-          const vol = cue.sound === "power" ? 0.6 : 0.5;
+          let vol = 0.5;
+          if (cue.sound === "tick") vol = 0.18;
+          else if (cue.sound === "power") vol = 0.6;
+          else if (cue.sound === "riser") vol = 0.4;
+          else if (cue.sound === "count") vol = 0.45;
           return (
-            <Sequence key={`sfx-${sceneIdx}-${ci}`} from={start + cue.frame} durationInFrames={20}>
+            <Sequence key={`sfx-${sceneIdx}-${ci}`} from={start + cue.frame} durationInFrames={14}>
               <Audio src={staticFile(file)} volume={() => vol} />
             </Sequence>
           );

@@ -1,5 +1,4 @@
 import React from "react";
-import { useCurrentFrame } from "remotion";
 import type { SceneDef } from "../data";
 import { StepScene } from "./StepScene";
 import {
@@ -30,12 +29,11 @@ const getOverlay = (sceneType: string | undefined): React.FC<{ f: number }> | un
   }
 };
 
-// Map sceneType → backgroundImage (用于各场景的浅背景 AI 图)
+// 角落 AI 点缀图（可保留也可去掉，新版主要靠 sceneBackground）
 const getBackgroundImage = (sceneType: string | undefined): string | undefined => {
   switch (sceneType) {
     case "Materials": return "illustrations/02_materials.png";
     case "Model": return "illustrations/03_model.png";
-    case "Slice": return "illustrations/04_slice.png";
     case "Print": return "illustrations/05_print.png";
     case "Layer": return "illustrations/06_layer.png";
     case "Remove": return "illustrations/07_remove.png";
@@ -48,10 +46,31 @@ const getBackgroundImage = (sceneType: string | undefined): string | undefined =
   }
 };
 
+// 全屏场景背景映射：每个 sceneType 对应一张场景图
+const getSceneBackground = (sceneType: string | undefined): string | undefined => {
+  switch (sceneType) {
+    case "Hook": return "bg_01_hook";
+    case "Materials": return "bg_02_materials";
+    case "Model": return "bg_03_model";
+    case "Slice": return "bg_04_slice";
+    case "Print": return "bg_05_print";
+    case "Layer": return "bg_06_layer";
+    case "Remove": return "bg_07_remove";
+    case "Servo": return "bg_08_servo";
+    case "Code": return "bg_09_code";
+    case "Power": return "bg_10_power";
+    case "Demo": return "bg_11_demo";
+    case "Roar": return "bg_12_roar";
+    case "End": return "bg_13_endcard";
+    default: return undefined;
+  }
+};
+
 // 通用场景渲染器：从 SceneDef 派发
 export const GenericScene: React.FC<{ scene: SceneDef }> = ({ scene }) => {
   const overlay = getOverlay(scene.sceneType);
   const bgImg = getBackgroundImage(scene.sceneType);
+  const sceneBg = getSceneBackground(scene.sceneType);
 
   // 把 line 元素过滤掉（这些由 Overlay 渲染），保留其它元素
   const filtered = scene.elements.filter((el) => el.kind !== "line");
@@ -75,7 +94,8 @@ export const GenericScene: React.FC<{ scene: SceneDef }> = ({ scene }) => {
       captionDelay={captionDelay}
       captionSize={captionEl?.textSize || 64}
       backgroundImage={bgImg}
-      backgroundOpacity={0.12}
+      backgroundOpacity={0.18}
+      sceneBackground={sceneBg}
       Overlay={overlay}
     />
   );

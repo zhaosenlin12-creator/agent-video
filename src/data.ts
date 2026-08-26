@@ -1,6 +1,12 @@
-﻿﻿﻿﻿// All scene data for the "一节课打印只活恐龙" 3D printing dinosaur video.
+// All scene data for the "一节课打印只活恐龙" 3D printing dinosaur video.
 // 13 scenes, viral formula: 数字 + 颠覆 + 情绪词 + 节奏短句
 // 每段多元素逐个入场（product-card-progressive-assemble）
+//
+// Layout zones (1920h):
+//   y=120  Step label / Top headline (handled by StepLabel component)
+//   y=300-1200  Hero subject zone (main illustration centered)
+//   y=1300-1500  Mid labels / stats
+//   y=1700-1850  Caption (rendered by StepScene, bottom: 200 = y≈1700)
 
 export type SceneKey =
   | "01_hook"
@@ -22,22 +28,18 @@ export type StepStyle = "Hook" | "Step" | "Counter" | "Caption" | "End";
 export interface SceneElement {
   id: string;
   kind: "title" | "subtitle" | "image" | "icon" | "label" | "step" | "line" | "tag" | "cta";
-  // For image elements
   src?: string;
   scale?: number;
-  // Layout
   x?: number | string;
   y?: number | string;
   w?: number | string;
   h?: number | string;
-  // Animation
   entrance?: "spring-rise" | "spring-pop" | "axial-flyin" | "fade" | "shutter" | "sweep";
   delay: number; // frames
   text?: string;
   textColor?: string;
   textSize?: number;
   highlight?: boolean;
-  // For icons (SVG inline path data)
   iconShape?: "printer" | "filament" | "arduino" | "servo" | "usb" | "tool" | "rocket" | "bolt";
 }
 
@@ -52,298 +54,287 @@ export interface SceneDef {
   counterNumber?: string;
   illustration?: string;
   sceneType?: string;
-  // New: elements array
   elements: SceneElement[];
-  // Audio cue for BGM sync
-  bgmBeatAt?: number; // frame index where key beat lands
+  bgmBeatAt?: number;
   sfxCues?: { frame: number; sound: "pop" | "whoosh" | "click" | "snap" | "riser" | "count" | "power" }[];
 }
 
 export const SCENES: SceneDef[] = [
-  // ====== HOOK ====== 5s =====
-  // 前 3 秒决胜负：大字弹入 + 主体恐龙飞入 + 桌面其他道具升起
+  // ====== 01 HOOK ====== 5s ======
   { key: "01_hook", text: "一节课打印只活恐龙，课间直接炸了。", emphasis: ["活恐龙", "课间炸了"], voiceSec: 3.89, minDur: 5.0, style: "Hook",
     sceneType: "Hook",
     elements: [
-      { id: "bg-glow", kind: "title", entrance: "fade", delay: 0, text: "" },
-      { id: "headline", kind: "title", entrance: "spring-rise", delay: 0, text: "一节课打印", textColor: "#FFD400", textSize: 140, highlight: true, x: "50%", y: 320 },
-      { id: "headline-2", kind: "title", entrance: "spring-rise", delay: 4, text: "只活恐龙", textColor: "#FFD400", textSize: 140, highlight: true, x: "50%", y: 480 },
-      { id: "dino", kind: "image", src: "illustrations/01_hook.png", entrance: "axial-flyin", delay: 14, scale: 1.0, x: "50%", y: 1200 },
-      { id: "subtitle", kind: "subtitle", entrance: "spring-rise", delay: 24, text: "课间直接炸了！", textColor: "#FFFFFF", textSize: 80, x: "50%", y: 1700 },
-      { id: "cap", kind: "label", entrance: "fade", delay: 30, text: "全班同学都看呆了，点击看完整实验", textColor: "#FFD400", textSize: 50, x: "50%", y: 1830 },
+      { id: "headline", kind: "title", entrance: "spring-rise", delay: 0, text: "一节课打印", textColor: "#FFD400", textSize: 130, highlight: true, x: "50%", y: 380 },
+      { id: "headline-2", kind: "title", entrance: "spring-rise", delay: 6, text: "只活恐龙", textColor: "#FFD400", textSize: 130, highlight: true, x: "50%", y: 540 },
+      { id: "dino", kind: "image", src: "illustrations/01_hook.png", entrance: "axial-flyin", delay: 14, scale: 1.0, x: "50%", y: 1150 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 30, text: "全班同学都看呆了，点击看完整实验", textColor: "#FFD400", textSize: 52, x: "50%", y: 1700 },
     ],
     bgmBeatAt: 30,
     sfxCues: [
       { frame: 0, sound: "whoosh" },
-      { frame: 4, sound: "snap" },
-      { frame: 14, sound: "snap" },
-      { frame: 24, sound: "snap" },
+      { frame: 6, sound: "tick" },
+      { frame: 14, sound: "tick" },
     ]
   },
 
-  // ====== MATERIALS ====== 5.8s =====
-  // 4件东西依次弹出，每件间隔 8f
+  // ====== 02 MATERIALS ====== 5.8s ======
   { key: "02_materials", text: "4件东西，30块搞定，学生党都能玩。", emphasis: ["4件", "30块", "学生党"], voiceSec: 4.50, minDur: 5.8, style: "Step",
     sceneType: "Materials",
     stepLabel: { en: "STEP 1", cn: "材料清单" },
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 1 · 材料清单", textColor: "#FFD400", textSize: 56 },
-      { id: "tile-1", kind: "icon", entrance: "spring-pop", delay: 8, iconShape: "printer", text: "3D打印机", textColor: "#FFFFFF", textSize: 50, x: 270, y: 600 },
-      { id: "tile-2", kind: "icon", entrance: "spring-pop", delay: 16, iconShape: "filament", text: "PLA耗材", textColor: "#FFFFFF", textSize: 50, x: 810, y: 600 },
-      { id: "tile-3", kind: "icon", entrance: "spring-pop", delay: 24, iconShape: "arduino", text: "Arduino", textColor: "#FFFFFF", textSize: 50, x: 270, y: 980 },
-      { id: "tile-4", kind: "icon", entrance: "spring-pop", delay: 32, iconShape: "servo", text: "舵机", textColor: "#FFFFFF", textSize: 50, x: 810, y: 980 },
-      { id: "price", kind: "label", entrance: "spring-rise", delay: 44, text: "全套 30 元搞定", textColor: "#FFD400", textSize: 80, highlight: true, x: 540, y: 1380 },
-      { id: "cap", kind: "label", entrance: "fade", delay: 56, text: "学生党都能玩", textColor: "#FFFFFF", textSize: 56, x: 540, y: 1700 },
+      { id: "tile-1", kind: "icon", entrance: "spring-pop", delay: 10, iconShape: "printer", text: "3D打印机", textColor: "#FFFFFF", textSize: 48, x: 280, y: 460 },
+      { id: "tile-2", kind: "icon", entrance: "spring-pop", delay: 18, iconShape: "filament", text: "PLA耗材", textColor: "#FFFFFF", textSize: 48, x: 800, y: 460 },
+      { id: "tile-3", kind: "icon", entrance: "spring-pop", delay: 26, iconShape: "arduino", text: "Arduino", textColor: "#FFFFFF", textSize: 48, x: 280, y: 880 },
+      { id: "tile-4", kind: "icon", entrance: "spring-pop", delay: 34, iconShape: "servo", text: "舵机", textColor: "#FFFFFF", textSize: 48, x: 800, y: 880 },
+      { id: "price", kind: "label", entrance: "spring-rise", delay: 46, text: "全套 30 元搞定", textColor: "#FFD400", textSize: 88, highlight: true, x: 540, y: 1320 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 56, text: "学生党都能玩", textColor: "#FFFFFF", textSize: 52, x: 540, y: 1700 },
     ],
     bgmBeatAt: 60,
     sfxCues: [
       { frame: 0, sound: "whoosh" },
-      { frame: 8, sound: "pop" },
-      { frame: 16, sound: "pop" },
-      { frame: 24, sound: "pop" },
-      { frame: 32, sound: "pop" },
-      { frame: 44, sound: "snap" },
+      { frame: 10, sound: "pop" },
+      { frame: 18, sound: "pop" },
+      { frame: 26, sound: "pop" },
+      { frame: 34, sound: "pop" },
+      { frame: 46, sound: "tick" },
     ]
   },
 
-  // ====== MODEL ====== 5.0s =====
-  // 3D模型从中心放大，分块显示（头/身/尾）
+  // ====== 03 MODEL ====== 5.0s ======
   { key: "03_model", text: "电脑里建出小恐龙，耳朵眼睛一条尾巴。", emphasis: ["建模", "三维结构"], voiceSec: 4.30, minDur: 5.0, style: "Step",
     sceneType: "Model",
     stepLabel: { en: "STEP 2", cn: "三维建模" },
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 2 · 三维建模", textColor: "#FFD400", textSize: 56 },
-      { id: "head", kind: "image", src: "illustrations/03_model.png", entrance: "axial-flyin", delay: 4, scale: 0.7, x: 540, y: 700 },
-      { id: "lbl-head", kind: "label", entrance: "spring-rise", delay: 18, text: "头部", textColor: "#FFD400", textSize: 60, x: 540, y: 280 },
-      { id: "lbl-body", kind: "label", entrance: "spring-rise", delay: 26, text: "躯干", textColor: "#FFD400", textSize: 60, x: 540, y: 1000 },
-      { id: "lbl-tail", kind: "label", entrance: "spring-rise", delay: 34, text: "尾巴", textColor: "#FFD400", textSize: 60, x: 540, y: 1280 },
-      { id: "timer", kind: "label", entrance: "spring-pop", delay: 50, text: "10 分钟", textColor: "#FFD400", textSize: 100, highlight: true, x: 540, y: 1620 },
+      { id: "head", kind: "image", src: "illustrations/03_model.png", entrance: "axial-flyin", delay: 6, scale: 0.85, x: 540, y: 850 },
+      { id: "lbl-head", kind: "label", entrance: "spring-rise", delay: 22, text: "头部", textColor: "#FFD400", textSize: 60, x: 540, y: 380 },
+      { id: "lbl-body", kind: "label", entrance: "spring-rise", delay: 30, text: "躯干", textColor: "#FFD400", textSize: 60, x: 540, y: 1000 },
+      { id: "lbl-tail", kind: "label", entrance: "spring-rise", delay: 38, text: "尾巴", textColor: "#FFD400", textSize: 60, x: 540, y: 1280 },
+      { id: "timer", kind: "label", entrance: "spring-pop", delay: 50, text: "10 分钟", textColor: "#FFD400", textSize: 96, highlight: true, x: 540, y: 1520 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 60, text: "三维结构一目了然", textColor: "#FFFFFF", textSize: 50, x: 540, y: 1700 },
     ],
     bgmBeatAt: 60,
     sfxCues: [
       { frame: 0, sound: "whoosh" },
-      { frame: 4, sound: "snap" },
-      { frame: 18, sound: "pop" },
-      { frame: 26, sound: "pop" },
-      { frame: 34, sound: "pop" },
-      { frame: 50, sound: "snap" },
+      { frame: 6, sound: "tick" },
+      { frame: 22, sound: "pop" },
+      { frame: 30, sound: "pop" },
+      { frame: 38, sound: "pop" },
+      { frame: 50, sound: "tick" },
     ]
   },
 
-  // ====== SLICE ====== 5.0s =====
-  // 切片软件界面，层从下往上扫
+  // ====== 04 SLICE ====== 5.0s ======
   { key: "04_slice", text: "犀牛切片，告诉机器每层怎么吐丝。", emphasis: ["切片", "每层怎么走"], voiceSec: 4.20, minDur: 5.0, style: "Step",
     sceneType: "Slice",
     stepLabel: { en: "STEP 3", cn: "切片路径" },
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 3 · 切片路径", textColor: "#FFD400", textSize: 56 },
-      { id: "screen", kind: "image", src: "illustrations/04_slice.png", entrance: "axial-flyin", delay: 6, scale: 0.7, x: 540, y: 700 },
-      // 切片层 SVG (动态)
-      { id: "layers", kind: "line", entrance: "sweep", delay: 18 },
-      { id: "info", kind: "label", entrance: "spring-rise", delay: 40, text: "200 层路径", textColor: "#FFD400", textSize: 80, highlight: true, x: 540, y: 1500 },
+      { id: "screen", kind: "image", src: "illustrations/04_slice.png", entrance: "axial-flyin", delay: 8, scale: 0.85, x: 540, y: 900 },
+      { id: "layers", kind: "line", entrance: "sweep", delay: 22 },
+      { id: "info", kind: "label", entrance: "spring-rise", delay: 44, text: "200 层路径", textColor: "#FFD400", textSize: 86, highlight: true, x: 540, y: 1480 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 56, text: "层层堆叠成型", textColor: "#FFFFFF", textSize: 50, x: 540, y: 1700 },
     ],
     bgmBeatAt: 60,
     sfxCues: [
       { frame: 0, sound: "whoosh" },
-      { frame: 6, sound: "snap" },
-      { frame: 18, sound: "click" },
-      { frame: 40, sound: "snap" },
+      { frame: 8, sound: "tick" },
+      { frame: 22, sound: "click" },
+      { frame: 44, sound: "tick" },
     ]
   },
 
-  // ====== PRINT ====== 5.5s =====
-  // 打印机扫动 + 喷头吐丝（动画）+ 半透明层堆叠
+  // ====== 05 PRINT ====== 5.5s ======
   { key: "05_print", text: "按下打印。喷头来回扫，塑料一秒秒堆出来。", emphasis: ["按下打印", "塑料堆出来"], voiceSec: 5.20, minDur: 5.5, style: "Step",
     sceneType: "Print",
     stepLabel: { en: "STEP 4", cn: "开始打印" },
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 4 · 开始打印", textColor: "#FFD400", textSize: 56 },
-      { id: "printer", kind: "image", src: "illustrations/05_print.png", entrance: "axial-flyin", delay: 6, scale: 0.6, x: 540, y: 750 },
-      { id: "nozzle-scan", kind: "line", entrance: "sweep", delay: 18 }, // SVG喷头扫描线
-      { id: "filament", kind: "line", entrance: "sweep", delay: 28 }, // 塑料流体
-      { id: "stats", kind: "label", entrance: "spring-rise", delay: 50, text: "0.2mm / 层", textColor: "#FFD400", textSize: 70, highlight: true, x: 540, y: 1500 },
-    ],
-    bgmBeatAt: 80,
-    sfxCues: [
-      { frame: 0, sound: "whoosh" },
-      { frame: 6, sound: "snap" },
-      { frame: 18, sound: "click" },
-      { frame: 28, sound: "click" },
-      { frame: 50, sound: "snap" },
-    ]
-  },
-
-  // ====== LAYER ====== 5.5s =====
-  // 恐龙轮廓扫描填充
-  { key: "06_layer", text: "层层堆叠，半小时恐龙就长出来了。", emphasis: ["半小时", "一点一点长出来"], voiceSec: 4.80, minDur: 5.5, style: "Step",
-    sceneType: "Layer",
-    stepLabel: { en: "STEP 5", cn: "层层堆叠" },
-    elements: [
-      { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 5 · 层层堆叠", textColor: "#FFD400", textSize: 56 },
-      { id: "dino-part", kind: "image", src: "illustrations/06_layer.png", entrance: "fade", delay: 6, scale: 0.65, x: 540, y: 700 },
-      { id: "scan-fill", kind: "line", entrance: "sweep", delay: 16 }, // 扫描填充
-      { id: "progress", kind: "label", entrance: "spring-pop", delay: 30, text: "30 min", textColor: "#FFD400", textSize: 100, highlight: true, x: 540, y: 1500 },
+      { id: "printer", kind: "image", src: "illustrations/05_print.png", entrance: "axial-flyin", delay: 8, scale: 0.95, x: 540, y: 900 },
       { id: "progress-bar", kind: "line", entrance: "sweep", delay: 38 },
+      { id: "progress", kind: "label", entrance: "spring-pop", delay: 50, text: "78%", textColor: "#FFD400", textSize: 96, highlight: true, x: 540, y: 1480 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 60, text: "塑料一秒秒堆出来", textColor: "#FFFFFF", textSize: 50, x: 540, y: 1700 },
     ],
     bgmBeatAt: 80,
     sfxCues: [
       { frame: 0, sound: "whoosh" },
-      { frame: 6, sound: "snap" },
+      { frame: 8, sound: "tick" },
       { frame: 16, sound: "click" },
-      { frame: 30, sound: "snap" },
+      { frame: 50, sound: "tick" },
     ]
   },
 
-  // ====== REMOVE ====== 5.0s =====
-  // 抓手拿起，掰支撑
+  // ====== 06 LAYER ====== 5.5s ======
+  { key: "06_layer", text: "一层 0.2 毫米，肉眼可见在堆高。", emphasis: ["0.2毫米", "肉眼可见"], voiceSec: 4.50, minDur: 5.5, style: "Step",
+    sceneType: "Layer",
+    stepLabel: { en: "STEP 5", cn: "逐层堆叠" },
+    elements: [
+      { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 5 · 逐层堆叠", textColor: "#FFD400", textSize: 56 },
+      { id: "layer-img", kind: "image", src: "illustrations/06_layer.png", entrance: "axial-flyin", delay: 8, scale: 0.9, x: 540, y: 900 },
+      { id: "layers", kind: "line", entrance: "sweep", delay: 22 },
+      { id: "layer-count", kind: "label", entrance: "spring-pop", delay: 44, text: "120 层", textColor: "#FFD400", textSize: 96, highlight: true, x: 540, y: 1480 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 56, text: "肉眼可见在堆高", textColor: "#FFFFFF", textSize: 50, x: 540, y: 1700 },
+    ],
+    bgmBeatAt: 80,
+    sfxCues: [
+      { frame: 0, sound: "whoosh" },
+      { frame: 8, sound: "tick" },
+      { frame: 22, sound: "click" },
+      { frame: 44, sound: "tick" },
+    ]
+  },
+
+  // ====== 07 REMOVE ====== 5.0s ======
   { key: "07_remove", text: "抠下成品，掰掉支撑，打磨边角。", emphasis: ["取下", "一气呵成"], voiceSec: 4.00, minDur: 5.0, style: "Step",
     sceneType: "Remove",
     stepLabel: { en: "STEP 6", cn: "取下成品" },
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 6 · 取下成品", textColor: "#FFD400", textSize: 56 },
-      { id: "part", kind: "image", src: "illustrations/07_remove.png", entrance: "axial-flyin", delay: 6, scale: 0.65, x: 540, y: 750 },
-      { id: "grip", kind: "line", entrance: "sweep", delay: 18 }, // 抓手SVG
-      { id: "twist", kind: "line", entrance: "sweep", delay: 30 }, // 掰支撑动画
-      { id: "check", kind: "label", entrance: "spring-pop", delay: 50, text: "✓ 完成", textColor: "#FFD400", textSize: 90, highlight: true, x: 540, y: 1500 },
+      { id: "part", kind: "image", src: "illustrations/07_remove.png", entrance: "axial-flyin", delay: 8, scale: 0.85, x: 540, y: 880 },
+      { id: "grip", kind: "line", entrance: "sweep", delay: 22 },
+      { id: "twist", kind: "line", entrance: "sweep", delay: 34 },
+      { id: "check", kind: "label", entrance: "spring-pop", delay: 52, text: "完成", textColor: "#FFD400", textSize: 96, highlight: true, x: 540, y: 1480 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 64, text: "一气呵成", textColor: "#FFFFFF", textSize: 50, x: 540, y: 1700 },
     ],
     bgmBeatAt: 70,
     sfxCues: [
       { frame: 0, sound: "whoosh" },
-      { frame: 6, sound: "snap" },
-      { frame: 18, sound: "click" },
-      { frame: 30, sound: "snap" },
-      { frame: 50, sound: "snap" },
+      { frame: 8, sound: "tick" },
+      { frame: 22, sound: "click" },
+      { frame: 34, sound: "tick" },
+      { frame: 52, sound: "tick" },
     ]
   },
 
-  // ====== SERVO ====== 5.0s =====
-  // 舵机飞入 + 插入身体
+  // ====== 08 SERVO ====== 5.0s ======
   { key: "08_servo", text: "舵机塞进身体，接三根控制线。", emphasis: ["装舵机", "接三根线"], voiceSec: 4.20, minDur: 5.0, style: "Step",
     sceneType: "Servo",
     stepLabel: { en: "STEP 7", cn: "安装舵机" },
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 7 · 安装舵机", textColor: "#FFD400", textSize: 56 },
-      { id: "dino-body", kind: "image", src: "illustrations/08_servo.png", entrance: "fade", delay: 6, scale: 0.65, x: 540, y: 750 },
-      { id: "servo", kind: "image", src: "illustrations/_aux_servo.png", entrance: "axial-flyin", delay: 18, scale: 0.4, x: 200, y: 400 },
-      { id: "wire-1", kind: "line", entrance: "sweep", delay: 32 },
-      { id: "wire-2", kind: "line", entrance: "sweep", delay: 38 },
-      { id: "wire-3", kind: "line", entrance: "sweep", delay: 44 },
-      { id: "count", kind: "label", entrance: "spring-pop", delay: 56, text: "3 根线", textColor: "#FFD400", textSize: 100, highlight: true, x: 540, y: 1620 },
+      { id: "dino-body", kind: "image", src: "illustrations/08_servo.png", entrance: "fade", delay: 8, scale: 0.85, x: 540, y: 880 },
+      { id: "servo", kind: "image", src: "illustrations/_aux_servo.png", entrance: "axial-flyin", delay: 22, scale: 0.4, x: 200, y: 480 },
+      { id: "wire-1", kind: "line", entrance: "sweep", delay: 36 },
+      { id: "wire-2", kind: "line", entrance: "sweep", delay: 42 },
+      { id: "wire-3", kind: "line", entrance: "sweep", delay: 48 },
+      { id: "count", kind: "label", entrance: "spring-pop", delay: 60, text: "3 根线", textColor: "#FFD400", textSize: 100, highlight: true, x: 540, y: 1480 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 70, text: "控制信号", textColor: "#FFFFFF", textSize: 50, x: 540, y: 1700 },
     ],
     bgmBeatAt: 70,
     sfxCues: [
       { frame: 0, sound: "whoosh" },
-      { frame: 6, sound: "snap" },
-      { frame: 18, sound: "snap" },
-      { frame: 32, sound: "click" },
-      { frame: 38, sound: "click" },
-      { frame: 44, sound: "click" },
-      { frame: 56, sound: "snap" },
+      { frame: 8, sound: "tick" },
+      { frame: 22, sound: "tick" },
+      { frame: 36, sound: "click" },
+      { frame: 42, sound: "click" },
+      { frame: 48, sound: "click" },
+      { frame: 60, sound: "tick" },
     ]
   },
 
-  // ====== CODE ====== 5.3s =====
-  // 代码逐行打出
+  // ====== 09 CODE ====== 5.3s ======
   { key: "09_code", text: "三行代码，让尾巴按节奏摇摆。", emphasis: ["三行", "按节奏摇"], voiceSec: 4.50, minDur: 5.3, style: "Step",
     sceneType: "Code",
     stepLabel: { en: "STEP 8", cn: "写控制代码" },
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 8 · 写控制代码", textColor: "#FFD400", textSize: 56 },
-      { id: "screen", kind: "image", src: "illustrations/09_code.png", entrance: "fade", delay: 4, scale: 0.6, x: 540, y: 650 },
-      { id: "line-1", kind: "line", entrance: "sweep", delay: 16 },
-      { id: "line-2", kind: "line", entrance: "sweep", delay: 24 },
-      { id: "line-3", kind: "line", entrance: "sweep", delay: 32 },
-      { id: "highlight", kind: "line", entrance: "sweep", delay: 42 },
-      { id: "ready", kind: "label", entrance: "spring-pop", delay: 56, text: "✓ 三行搞定", textColor: "#FFD400", textSize: 80, highlight: true, x: 540, y: 1620 },
+      { id: "screen", kind: "image", src: "illustrations/09_code.png", entrance: "fade", delay: 6, scale: 0.78, x: 540, y: 820 },
+      { id: "line-1", kind: "line", entrance: "sweep", delay: 20 },
+      { id: "line-2", kind: "line", entrance: "sweep", delay: 28 },
+      { id: "line-3", kind: "line", entrance: "sweep", delay: 36 },
+      { id: "highlight", kind: "line", entrance: "sweep", delay: 46 },
+      { id: "ready", kind: "label", entrance: "spring-pop", delay: 60, text: "三行搞定", textColor: "#FFD400", textSize: 86, highlight: true, x: 540, y: 1480 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 72, text: "节奏摇摆", textColor: "#FFFFFF", textSize: 50, x: 540, y: 1700 },
     ],
     bgmBeatAt: 80,
     sfxCues: [
       { frame: 0, sound: "whoosh" },
-      { frame: 4, sound: "snap" },
-      { frame: 16, sound: "click" },
-      { frame: 24, sound: "click" },
-      { frame: 32, sound: "click" },
-      { frame: 56, sound: "snap" },
+      { frame: 6, sound: "tick" },
+      { frame: 20, sound: "click" },
+      { frame: 28, sound: "click" },
+      { frame: 36, sound: "click" },
+      { frame: 60, sound: "tick" },
     ]
   },
 
-  // ====== POWER ====== 4.2s =====
-  // 3-2-1 倒数 + 通电闪光
+  // ====== 10 POWER ====== 4.2s ======
   { key: "10_power", text: "插上电，三二一，尾巴立刻晃。", emphasis: ["通电", "三二一", "尾巴晃"], voiceSec: 3.30, minDur: 4.2, style: "Counter",
     sceneType: "Power",
     elements: [
       { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 9 · 通电测试", textColor: "#FFD400", textSize: 56 },
-      { id: "dino-off", kind: "image", src: "illustrations/10_power.png", entrance: "fade", delay: 4, scale: 0.65, x: 540, y: 800 },
-      { id: "counter", kind: "line", entrance: "sweep", delay: 12 }, // SVG 倒数数字
-      { id: "zap", kind: "line", entrance: "shutter", delay: 76 }, // 通电闪光
+      { id: "dino-off", kind: "image", src: "illustrations/10_power.png", entrance: "fade", delay: 6, scale: 0.85, x: 540, y: 900 },
+      { id: "counter", kind: "line", entrance: "sweep", delay: 16 },
+      { id: "zap", kind: "line", entrance: "shutter", delay: 80 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 30, text: "尾巴立刻晃", textColor: "#FFFFFF", textSize: 50, x: 540, y: 1700 },
     ],
     bgmBeatAt: 60,
     sfxCues: [
       { frame: 0, sound: "whoosh" },
-      { frame: 12, sound: "count" },
-      { frame: 22, sound: "count" },
-      { frame: 32, sound: "count" },
-      { frame: 76, sound: "power" },
+      { frame: 16, sound: "count" },
+      { frame: 28, sound: "count" },
+      { frame: 40, sound: "count" },
+      { frame: 80, sound: "power" },
     ]
   },
 
-  // ====== DEMO ====== 3.5s =====
-  // 摇头摆尾动画
+  // ====== 11 DEMO ====== 3.5s ======
   { key: "11_demo", text: "摆在桌上，冲你摇头摆尾。", emphasis: ["摇头摆尾"], voiceSec: 2.80, minDur: 3.5, style: "Caption",
     sceneType: "Demo",
     elements: [
-      { id: "dino", kind: "image", src: "illustrations/11_demo.png", entrance: "spring-rise", delay: 0, scale: 0.65, x: 540, y: 750 },
-      { id: "tail", kind: "line", entrance: "sweep", delay: 8 },
-      { id: "head", kind: "line", entrance: "sweep", delay: 16 },
-      { id: "tag", kind: "label", entrance: "spring-pop", delay: 24, text: "好可爱！", textColor: "#FFD400", textSize: 100, highlight: true, x: 540, y: 1620 },
+      { id: "dino", kind: "image", src: "illustrations/11_demo.png", entrance: "spring-rise", delay: 0, scale: 0.95, x: 540, y: 880 },
+      { id: "tail", kind: "line", entrance: "sweep", delay: 12 },
+      { id: "head", kind: "line", entrance: "sweep", delay: 20 },
+      { id: "tag", kind: "label", entrance: "spring-pop", delay: 30, text: "好可爱", textColor: "#FFD400", textSize: 110, highlight: true, x: 540, y: 1500 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 40, text: "摇头摆尾", textColor: "#FFFFFF", textSize: 52, x: 540, y: 1700 },
     ],
     bgmBeatAt: 50,
     sfxCues: [
       { frame: 0, sound: "whoosh" },
-      { frame: 8, sound: "pop" },
-      { frame: 16, sound: "pop" },
-      { frame: 24, sound: "snap" },
+      { frame: 12, sound: "pop" },
+      { frame: 20, sound: "pop" },
+      { frame: 30, sound: "tick" },
     ]
   },
 
-  // ====== ROAR ====== 5.5s =====
-  // 张嘴 + 声波 + 围过来
+  // ====== 12 ROAR ====== 5.5s ======
   { key: "12_roar", text: "按下遥控，一声吼叫，全班都围过来。", emphasis: ["吼叫", "全班围过来"], voiceSec: 3.50, minDur: 5.5, style: "Caption",
     sceneType: "Roar",
     elements: [
-      { id: "dino", kind: "image", src: "illustrations/12_roar.png", entrance: "spring-rise", delay: 0, scale: 0.7, x: 540, y: 800 },
-      { id: "roar", kind: "line", entrance: "sweep", delay: 8 }, // 张嘴动画
-      { id: "wave", kind: "line", entrance: "sweep", delay: 16 }, // 声波
-      { id: "people", kind: "line", entrance: "sweep", delay: 28 }, // 人影
-      { id: "burst", kind: "label", entrance: "spring-pop", delay: 60, text: "全班围过来！", textColor: "#FFD400", textSize: 90, highlight: true, x: 540, y: 1620 },
+      { id: "dino", kind: "image", src: "illustrations/12_roar.png", entrance: "spring-rise", delay: 0, scale: 0.95, x: 540, y: 880 },
+      { id: "roar", kind: "line", entrance: "sweep", delay: 12 },
+      { id: "wave", kind: "line", entrance: "sweep", delay: 22 },
+      { id: "people", kind: "line", entrance: "sweep", delay: 36 },
+      { id: "burst", kind: "label", entrance: "spring-pop", delay: 70, text: "全班围过来", textColor: "#FFD400", textSize: 96, highlight: true, x: 540, y: 1500 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 50, text: "一声吼叫", textColor: "#FFFFFF", textSize: 52, x: 540, y: 1700 },
     ],
     bgmBeatAt: 80,
     sfxCues: [
       { frame: 0, sound: "whoosh" },
-      { frame: 8, sound: "snap" },
-      { frame: 16, sound: "riser" },
-      { frame: 60, sound: "snap" },
+      { frame: 12, sound: "tick" },
+      { frame: 22, sound: "riser" },
+      { frame: 70, sound: "tick" },
     ]
   },
 
-  // ====== ENDCARD ====== 5.5s =====
-  // 飞入点赞 + 关注 + 下期预告
+  // ====== 13 ENDCARD ====== 5.5s ======
   { key: "13_endcard", text: "点赞收藏，下期教你做四足机甲。", emphasis: ["点赞收藏", "四足机甲"], voiceSec: 4.00, minDur: 5.5, style: "End",
     sceneType: "End",
     elements: [
-      { id: "heart", kind: "icon", entrance: "spring-pop", delay: 0, iconShape: "rocket", text: "点赞", textColor: "#FFFFFF", textSize: 70, x: 320, y: 800 },
-      { id: "star", kind: "icon", entrance: "spring-pop", delay: 6, iconShape: "rocket", text: "收藏", textColor: "#FFFFFF", textSize: 70, x: 760, y: 800 },
-      { id: "title", kind: "title", entrance: "spring-rise", delay: 18, text: "下期更精彩", textColor: "#FFD400", textSize: 130, highlight: true, x: 540, y: 1100 },
-      { id: "preview", kind: "image", src: "illustrations/13_flash3.png", entrance: "axial-flyin", delay: 28, scale: 0.5, x: 540, y: 1500 },
-      { id: "follow", kind: "label", entrance: "spring-pop", delay: 50, text: "关注我不错过", textColor: "#FFD400", textSize: 80, highlight: true, x: 540, y: 1700 },
+      { id: "heart", kind: "icon", entrance: "spring-pop", delay: 0, iconShape: "rocket", text: "点赞", textColor: "#FFFFFF", textSize: 72, x: 320, y: 480 },
+      { id: "star", kind: "icon", entrance: "spring-pop", delay: 8, iconShape: "rocket", text: "收藏", textColor: "#FFFFFF", textSize: 72, x: 760, y: 480 },
+      { id: "title", kind: "title", entrance: "spring-rise", delay: 22, text: "下期更精彩", textColor: "#FFD400", textSize: 120, highlight: true, x: "50%", y: 900 },
+      { id: "preview", kind: "image", src: "illustrations/13_flash3.png", entrance: "axial-flyin", delay: 36, scale: 0.45, x: "50%", y: 1280 },
+      { id: "follow", kind: "label", entrance: "spring-pop", delay: 60, text: "关注我不错过", textColor: "#FFD400", textSize: 80, highlight: true, x: "50%", y: 1640 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 76, text: "下期教你做四足机甲", textColor: "#FFFFFF", textSize: 50, x: "50%", y: 1700 },
     ],
     bgmBeatAt: 80,
     sfxCues: [
       { frame: 0, sound: "pop" },
-      { frame: 6, sound: "pop" },
-      { frame: 18, sound: "snap" },
-      { frame: 28, sound: "snap" },
-      { frame: 50, sound: "snap" },
+      { frame: 8, sound: "pop" },
+      { frame: 22, sound: "tick" },
+      { frame: 36, sound: "tick" },
+      { frame: 60, sound: "tick" },
     ]
   },
 ];
@@ -370,6 +361,3 @@ export function sceneFrameRange(idx: number): { start: number; duration: number 
   for (let i = 0; i < idx; i++) start += sceneFrames(SCENES[i]);
   return { start, duration: sceneFrames(SCENES[idx]) };
 }
-
-
-

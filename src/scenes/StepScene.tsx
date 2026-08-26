@@ -1,11 +1,15 @@
-﻿﻿import React from "react";
-import { useCurrentFrame, interpolate } from "remotion";
+import React from "react";
+import { useCurrentFrame, interpolate, Img, staticFile } from "remotion";
 import type { SceneElement } from "../data";
 import { ElementRenderer } from "../components/ElementRenderer";
-import { elementStyle } from "../components/motion";
 
-// 通用 Step Scene：背景 + elements + 顶部 step 标签 + 底部 caption
-// 大部分场景都符合这个模式
+// 通用 Step Scene：5 层 z-index 严格分层
+//   z=0  Background scene image (full screen, dark overlay)
+//   z=1  Grid lines (subtle)
+//   z=2  AI accent (corner, optional)
+//   z=3  Main hero elements (centered, scaled up)
+//   z=4  Text overlays (labels, step number, side panels)
+//   z=5  Caption (bottom, semi-transparent backdrop)
 interface Props {
   elements: SceneElement[];
   caption: string;
@@ -13,8 +17,9 @@ interface Props {
   captionDelay?: number;
   captionSize?: number;
   bg?: string;
-  backgroundImage?: string;
+  backgroundImage?: string;       // 角落 AI 小图（值已含 illustrations/ 前缀，如 illustrations/02_materials.png）
   backgroundOpacity?: number;
+  sceneBackground?: string;        // 场景背景 key（不含 .png），如 bg_01_hook
   // Specific overlay component (e.g., counter, scan, etc.)
   Overlay?: React.FC<{ f: number }>;
 }
@@ -27,16 +32,22 @@ export const StepScene: React.FC<Props> = ({
   captionSize = 64,
   bg = "#0a0c14",
   backgroundImage,
-  backgroundOpacity = 0.12,
+  backgroundOpacity = 0.18,
+  sceneBackground,
   Overlay,
 }) => {
   const f = useCurrentFrame();
-  const totalFrames = 30 * 6;
   const captionOpacity = interpolate(f, [captionDelay, captionDelay + 15], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
   const captionY = interpolate(f, [captionDelay, captionDelay + 15], [30, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  // Background scene fade-in (only first 12 frames)
+  const sceneBgOpacity = interpolate(f, [0, 12], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -79,74 +90,119 @@ export const StepScene: React.FC<Props> = ({
         fontFamily: "Microsoft YaHei, PingFang SC, sans-serif",
       }}
     >
-      {/* Grid bg */}
+      {/* === z=0 全屏场景背景 === */}
+      {sceneBackground && (
+        <>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              opacity: sceneBgOpacity,
+              pointerEvents: "none",
+              overflow: "hidden",
+            }}
+          >
+            <Img
+              src={staticFile(`illustrations/${sceneBackground}.png`)}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
+          </div>
+          {/* 深色蒙层确保前景可读 */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(180deg, rgba(10,12,20,0.55) 0%, rgba(10,12,20,0.78) 50%, rgba(10,12,20,0.92) 100%)",
+              pointerEvents: "none",
+              opacity: sceneBgOpacity,
+            }}
+          />
+        </>
+      )}
+
+      {/* === z=1 网格 (subtle) === */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "linear-gradient(rgba(255,212,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,212,0,0.04) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
+            "linear-gradient(rgba(255,212,0,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,212,0,0.025) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+          pointerEvents: "none",
         }}
       />
-      {/* Radial glow */}
+      {/* 暖色径向高光（强化中心主体） */}
       <div
         style={{
           position: "absolute",
           left: "50%",
-          top: "55%",
+          top: "42%",
           translate: "-50% -50%",
-          width: 1200,
-          height: 1200,
-          background: "radial-gradient(circle, rgba(255,212,0,0.08) 0%, transparent 60%)",
+          width: 1400,
+          height: 1400,
+          background: "radial-gradient(circle, rgba(255,212,0,0.08) 0%, transparent 55%)",
           pointerEvents: "none",
         }}
       />
 
-      {/* Background AI illustration (small accent, bottom-right corner) */}
+      {/* === z=2 AI 角落点缀（可选） === */}
       {backgroundImage && (
         <div
           style={{
             position: "absolute",
-            left: "78%",
+            left: "76%",
             top: "78%",
             translate: "-50% -50%",
-            width: "32%",
-            height: "28%",
+            width: "30%",
+            height: "22%",
             opacity: backgroundOpacity,
             pointerEvents: "none",
-            filter: "blur(4px) saturate(0.6)",
+            filter: "blur(3px) saturate(0.65)",
+            zIndex: 2,
           }}
         >
-          <img
-            src={`public/${backgroundImage}`}
+          <Img
+            src={staticFile(backgroundImage)}
             style={{ width: "100%", height: "100%", objectFit: "contain" }}
             alt=""
           />
         </div>
       )}
 
-      {/* Custom SVG overlay */}
-      {Overlay && <Overlay f={f} />}
-
-      {/* Elements (skip "line" kind, those are handled by Overlay) */}
+      {/* === z=3 主体元素（hero） === */}
       {elements
         .filter((el) => el.kind !== "line")
         .sort((a, b) => a.delay - b.delay)
         .map((el) => (
-          <ElementRenderer key={el.id} el={el} />
+          <div key={el.id} style={{ zIndex: 3, position: "absolute", inset: 0, pointerEvents: "none" }}>
+            <ElementRenderer el={el} />
+          </div>
         ))}
 
-      {/* Caption */}
+      {/* === z=4 SVG overlay (custom per scene) === */}
+      {Overlay && (
+        <div style={{ position: "absolute", inset: 0, zIndex: 4, pointerEvents: "none" }}>
+          <Overlay f={f} />
+        </div>
+      )}
+
+      {/* === z=5 字幕 (bottom safe zone) === */}
       <div
         style={{
           position: "absolute",
           left: 0,
           right: 0,
-          bottom: 270,
+          bottom: 200,
           textAlign: "center",
           opacity: captionOpacity,
           transform: `translateY(${captionY}px)`,
+          zIndex: 5,
+          pointerEvents: "none",
         }}
       >
         <div
@@ -156,10 +212,12 @@ export const StepScene: React.FC<Props> = ({
             color: "#FFFFFF",
             fontWeight: 700,
             textShadow: "0 4px 0 rgba(0,0,0,0.6)",
-            background: "rgba(10,12,20,0.85)",
-            padding: "16px 32px",
-            borderRadius: 16,
+            background: "rgba(10,12,20,0.78)",
+            padding: "18px 36px",
+            borderRadius: 18,
             borderLeft: "6px solid #FFD400",
+            maxWidth: "90%",
+            lineHeight: 1.35,
           }}
         >
           {renderCaption()}
@@ -168,6 +226,3 @@ export const StepScene: React.FC<Props> = ({
     </div>
   );
 };
-
-
-
