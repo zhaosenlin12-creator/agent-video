@@ -63,11 +63,42 @@
 { key: "01_hook", text: "一节课搓架航模，全班直接炸了！", emphasis: ["一节课", "搓架航模"], voiceSec: 3.31, style: "Hook", sceneType: "Hook" }
 ```
 
-### Step 2：插画生成（1-3 分钟）
+### Step 2：插画生成（5-15 分钟）— 推荐使用 AI 生图
 
-运行 `python scripts/redraw.py`，自动生成 12 张 PNG 到 `public/illustrations/`。
+**首选方案：AI 图像 API（minimax image-01 / jojo-code-imagegen）**
 
-⚠️ **坑**：所有中文文字必须用 `font=font(54, bold=True, en=False)`（`msyhbd.ttc`），用 `en=True` 会渲染成豆腐块（"？？？"）。
+每个场景 1 张 1080x1920 9:16 PNG，放到 `public/illustrations/01_hook.png` ~ `13_endcard.png`。
+
+#### API 调用模板（minimax）
+```powershell
+$apiKey = "sk-cp-..."
+$body = '{"model":"image-01","prompt":"a cool cartoon airplane soaring into night sky, pop art flat illustration, vibrant teal and orange, vertical 9:16 composition, no watermark, no text, no logos","aspect_ratio":"9:16","response_format":"url","n":1,"prompt_optimizer":true}'
+$resp = Invoke-WebRequest -Uri "https://api.minimaxi.com/v1/image_generation" -Method POST -ContentType "application/json" -Headers @{"Authorization"="Bearer $apiKey"} -Body $body -TimeoutSec 180
+$url = ($resp.Content | ConvertFrom-Json).data.image_urls[0]
+Invoke-WebRequest -Uri $url -OutFile "public\illustrations\01_hook.png" -TimeoutSec 60
+```
+
+#### Prompt 设计原则
+- **明确风格**：pop art flat illustration / cartoon / comic style
+- **明确比例**：vertical 9:16 composition
+- **明确禁用**：no watermark, no text, no logos
+- **每个场景独立 prompt**：要描述具体内容（如 "foam board airplane soaring with speed lines" 而不是泛泛的 "airplane"）
+- **风格统一**：所有 12 张都强调 pop art flat illustration 保持视觉一致
+
+#### 缩放到 1080x1920
+```python
+from PIL import Image
+img = Image.open("src.jpg").convert("RGB").resize((1080, 1920), Image.LANCZOS)
+img.save("public/illustrations/01_hook.png", "PNG", optimize=True)
+```
+
+#### 备选方案：PIL 本地脚本（无 API 费用）
+如果 AI API 不可用，使用 `python scripts/redraw.py` 生成简洁矢量风格插画。
+
+⚠️ **坑**：
+- minimax OSS 链接 30 分钟过期，必须生成后立刻下载
+- 单图 30s 返回，避免并发限流
+- 提示词必须包含 "no text" 否则 AI 会在画面上生成乱码文字
 
 ### Step 3：TTS 录制（2-5 分钟）
 
@@ -136,15 +167,36 @@ npx remotion render WaterRocketDouyin out\video-h264.mp4 --codec h264 --crf 17
 ## 六、验收总则
 
 每次产出视频必须达到：
-1. ✅ 1080x1920 / 30fps / h264 / yuv420p
-2. ✅ crf 17，文件 40-50MB，码率 ≥ 5Mbps
-3. ✅ 时长 40-70 秒，13 段结构
-4. ✅ **0 个 "？" 乱码**（中文全用 msyhbd.ttc）
-5. ✅ **0 个静态画面**（每段都有动效：spring / interpolate / SVG overlay）
-6. ✅ **2-3 段真实视频片段**（Pexels CC0）
-7. ✅ 中文 TTS XiaoxiaoNeural +5%
-8. ✅ BGM 音量 0.18
-9. ✅ QA 9/9 PASS
-10. ✅ 抽帧样张视觉清晰
+
+| 项 | 标准 | 备注 |
+|---|---|---|
+| 1 | ✅ 1080x1920 / 30fps / h264 / yuv420p | 抖音标准规格 |
+| 2 | ✅ crf 17，文件 40-80MB（AI 生图版 ≤ 80MB，PIL 版 ≤ 50MB），码率 ≥ 5Mbps | QA 自动校验 |
+| 3 | ✅ 时长 40-70 秒，13 段结构 | Hook+10step+2real+Endcard |
+| 4 | ✅ **0 个 "？" 乱码**（中文全用 msyhbd.ttc / AI prompt 加 no text） | QA 抽帧 + 视觉抽检 |
+| 5 | ✅ **0 个静态画面**（每段都有动效：spring / interpolate / SVG overlay） | 视觉抽检 |
+| 6 | ✅ **2-3 段真实视频片段**（Pexels CC0） | 拉代入感 |
+| 7 | ✅ 中文 TTS XiaoxiaoNeural +5% | 自然 + 不抢节奏 |
+| 8 | ✅ BGM 音量 0.18 | 不抢人声 |
+| 9 | ✅ QA 9/9 PASS（自动） | `.\qa\qa_check.ps1` |
+| 10 | ✅ 抽帧样张视觉清晰（4x4 contact sheet） | 视频片段预览 |
+| 11 | ✅ 插图风格统一（推荐 AI 生图 pop-art / cartoon） | 单条视频视觉一致 |
 
 任意一条不满足 → 修复 → 重渲染 → 重跑 QA。
+
+---
+
+## 七、两条插画路径对比
+
+| 维度 | PIL 本地脚本（`redraw.py`） | AI 图像 API（minimax image-01） |
+|---|---|---|
+| **视觉风格** | 矢量扁平色块（简洁） | pop-art / 漫画风格（精致） |
+| **耗时** | 1-3 分钟 | 5-15 分钟（含下载 + resize） |
+| **成本** | 0 | 按 API 收费（约 0.1-0.3 元/张） |
+| **风格一致性** | 100%（程序化） | 95%（需 prompt 统一） |
+| **适合场景** | 快速原型、离线、无 API | 正式成片、视觉冲击 |
+| **质量天花板** | 中等（线稿风） | 高（接近商业插画） |
+
+**推荐组合**：AI 生图做 12 张主图，PIL 做兜底（API 故障时）。
+
+

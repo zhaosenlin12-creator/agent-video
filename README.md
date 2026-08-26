@@ -28,7 +28,7 @@ ffplay out/water-rocket-h264.mp4
 #    重跑 npm run build-h264
 ```
 
-## 这个仓库能做什么
+## 出片质量（航模搭建样片 v2.0）\n\n`\n规格：1080x1920 / 30fps / h264 / yuv420p / crf 17\n体积：64.9MB（AI 生图版）/ 45.9MB（PIL 版）\n时长：67s\nQA：9/9 PASS（自动校验）\n插图：12 张 minimax image-01 pop-art 风格（备选 PIL）\n`\n\n## 这个仓库能做什么
 
 把任意 80-160 字的科普 / 教程 / 实验 / 步骤说明类文案，**2-4 小时内**变成一条抖音算法友好的竖屏短视频：
 
@@ -36,7 +36,7 @@ ffplay out/water-rocket-h264.mp4
 - h264 / yuv420p / crf 17（视觉等同抖音超清）
 - **Remotion 4 + React 19**（每场景独立动效，告别"静态画面"）
 - 中文旁白 + 黄色关键词高亮（`#FFD400`）
-- 干净 PNG 插画（无元素素材水印）
+- **AI 生成 pop-art 风格插图**（minimax image-01，可选 PIL 兜底）
 - edge-tts 中文 TTS（XiaoxiaoNeural 女声）
 - 真实视频片段（Ken Burns 平移放大，CC0 Pexels）
 - BGM 压到 0.18 不抢 TTS
@@ -116,3 +116,4 @@ agent-video/
 ## License
 
 MIT
+
