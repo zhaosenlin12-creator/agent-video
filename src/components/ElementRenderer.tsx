@@ -1,4 +1,4 @@
-﻿﻿import React from "react";
+import React from "react";
 import { useCurrentFrame, Img, staticFile, interpolate } from "remotion";
 import { elementStyle, ElementStyleOpts } from "./motion";
 import { IconRenderer } from "./Icons";
@@ -6,14 +6,13 @@ import type { SceneElement } from "../data";
 
 interface Props {
   el: SceneElement;
-  frame?: number; // override current frame (for animation control)
+  frame?: number;
 }
 
 export const ElementRenderer: React.FC<Props> = ({ el, frame }) => {
   const cf = useCurrentFrame();
   const f = frame ?? cf;
 
-  // Get element animation style
   const style: ElementStyleOpts = {
     f,
     delay: el.delay,
@@ -22,9 +21,7 @@ export const ElementRenderer: React.FC<Props> = ({ el, frame }) => {
     fromScale: 0.5,
   };
 
-  // For axial-flyin, allow per-element fromX (left or right side entry)
   if (el.entrance === "axial-flyin" && el.id) {
-    // Use deterministic id-based direction
     const seed = el.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
     style.fromX = (seed % 2 === 0) ? -800 : 800;
     style.fromY = 100;
@@ -32,23 +29,20 @@ export const ElementRenderer: React.FC<Props> = ({ el, frame }) => {
 
   const s = elementStyle(style);
 
-  // Base positioning
   const baseStyle: React.CSSProperties = {
     position: "absolute",
-    left: typeof el.x === "number" ? el.x : el.x ? `${el.x}` : "50%",
-    top: typeof el.y === "number" ? el.y : el.y ? `${el.y}` : "50%",
+    left: typeof el.x === "number" ? el.x : el.x ? el.x : "50%",
+    top: typeof el.y === "number" ? el.y : el.y ? el.y : "50%",
     transform: s.transform,
     opacity: s.opacity,
     transformOrigin: "center",
     willChange: "transform, opacity",
   };
 
-  // Translate percentages to translateX(-50%) if it's %
   if ((typeof el.x === "string" && el.x.endsWith("%")) || (typeof el.y === "string" && el.y.endsWith("%"))) {
     baseStyle.translate = "-50% -50%";
   }
 
-  // Render based on kind
   switch (el.kind) {
     case "title":
     case "subtitle": {
@@ -119,15 +113,13 @@ export const ElementRenderer: React.FC<Props> = ({ el, frame }) => {
     }
 
     case "image": {
-      // 主图上限：宽度按 scale，高度按 9:16 比例自动算，但 hard cap 1080 防溢出
-      const w = (el.w ? el.w : Math.min(1080 * (el.scale || 0.65), 1000));
-      const h = el.h ? el.h : Math.min(w * 1.4, 1180);  // max height 1180，留出 y=200..1380 主体区
-      // Post-entrance: subtle pulse/sway
+      const w = el.w ? el.w : Math.min(1080 * (el.scale || 0.65), 1000);
+      const h = el.h ? el.h : Math.min(w * 1.4, 1180);
       const entranceT = (f - el.delay) / 12;
       const postEntrance = entranceT > 1;
       const pulseScale = postEntrance ? 1 + Math.sin((f - el.delay - 12) * 0.08) * 0.015 : 1;
       const swayRot = postEntrance ? Math.sin((f - el.delay - 12) * 0.05) * 1.2 : 0;
-      const combinedTransform = s.transform.includes("scale(") ? s.transform : `scale(${pulseScale}) rotate(${swayRot}deg) ${s.transform}`;
+      const combinedTransform = s.transform.includes("scale(") ? s.transform : "scale(" + pulseScale + ") rotate(" + swayRot + "deg) " + s.transform;
       return (
         <div
           style={{
@@ -147,7 +139,7 @@ export const ElementRenderer: React.FC<Props> = ({ el, frame }) => {
               maxWidth: "100%",
               maxHeight: "100%",
               objectFit: "contain",
-              filter: el.kind === "image" ? "drop-shadow(0 8px 16px rgba(0,0,0,0.4))" : undefined,
+              filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.4))",
             }}
           />
         </div>
@@ -191,8 +183,35 @@ export const ElementRenderer: React.FC<Props> = ({ el, frame }) => {
       );
     }
 
+    case "sparkle": {
+      const spinT = (f - el.delay) / 12;
+      const spin = spinT > 0 ? spinT * 90 : 0;
+      const twinkle = 1 + Math.sin((f - el.delay) * 0.3) * 0.3;
+      const sparkleTransform = s.transform.includes("scale(")
+        ? s.transform
+        : "scale(" + twinkle + ") rotate(" + spin + "deg) " + s.transform;
+      return (
+        <div
+          style={{
+            ...baseStyle,
+            transform: sparkleTransform,
+            width: 80,
+            height: 80,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            filter: "drop-shadow(0 0 12px rgba(255,212,0,0.9))",
+          }}
+        >
+          <svg viewBox="0 0 100 100" width="80" height="80">
+            <polygon points="50,5 61,40 95,50 61,60 50,95 39,60 5,50 39,40" fill="#FFD400" stroke="#FFEB6B" strokeWidth="2" />
+            <polygon points="50,20 56,44 80,50 56,56 50,80 44,56 20,50 44,44" fill="#FFFFFF" opacity="0.85" />
+          </svg>
+        </div>
+      );
+    }
+
     case "line": {
-      // Generic placeholder for line/SVG overlay (handled in scene component)
       return <div style={{ ...baseStyle, display: "none" }}>{el.text}</div>;
     }
 
@@ -242,4 +261,3 @@ export const ElementRenderer: React.FC<Props> = ({ el, frame }) => {
       return null;
   }
 };
-
