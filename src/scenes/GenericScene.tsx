@@ -13,7 +13,6 @@ import {
   RemoveOverlay,
 } from "../components/SceneOverlays";
 
-// Map sceneType → overlay
 const getOverlay = (sceneType: string | undefined): React.FC<{ f: number }> | undefined => {
   switch (sceneType) {
     case "Print": return PrintOverlay;
@@ -29,7 +28,6 @@ const getOverlay = (sceneType: string | undefined): React.FC<{ f: number }> | un
   }
 };
 
-// 全屏场景背景映射：每个 sceneType 对应一张新生成的空场景背景
 const getSceneBackground = (sceneType: string | undefined): string | undefined => {
   switch (sceneType) {
     case "Hook": return "bg_01_hook";
@@ -49,8 +47,8 @@ const getSceneBackground = (sceneType: string | undefined): string | undefined =
   }
 };
 
-// 通用场景渲染器：从 SceneDef 派发
-// v8: 不再传 backgroundImage（角落点缀），完全靠 sceneBackground + 透明角色 + Remotion 动画
+import { sceneFrames } from "../data";
+
 export const GenericScene: React.FC<{ scene: SceneDef }> = ({ scene }) => {
   const overlay = getOverlay(scene.sceneType);
   const sceneBg = getSceneBackground(scene.sceneType);
@@ -75,6 +73,7 @@ export const GenericScene: React.FC<{ scene: SceneDef }> = ({ scene }) => {
       captionDelay={captionDelay}
       captionSize={captionEl?.textSize || 64}
       sceneBackground={sceneBg}
+      duration={sceneFrames(scene)}
       Overlay={overlay}
     />
   );

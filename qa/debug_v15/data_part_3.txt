@@ -1,0 +1,33 @@
+ 03 MODEL ====== 5.0s ======
+  {
+    key: "03_model",
+    text: "电脑里建出小恐龙，耳朵眼睛一条尾巴。",
+    emphasis: ["建模", "三维结构"],
+    voiceSec: 4.03,
+    minDur: 5.0,
+    style: "Step",
+    sceneType: "Model",
+    stepLabel: { en: "STEP 2", cn: "三维建模" },
+    elements: [
+      { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 2 · 三维建模", textColor: "#FFD400", textSize: 56 },
+      { id: "head", kind: "image", src: "illustrations/03_model_t.png", entrance: "axial-flyin", delay: 8, scale: 0.7, x: 540, y: 920 },
+      { id: "lbl-head", kind: "label", entrance: "spring-rise", delay: 22, text: "头", textColor: "#FFD400", textSize: 56, x: 200, y: 720 },
+      { id: "lbl-body", kind: "label", entrance: "spring-rise", delay: 30, text: "躯干", textColor: "#FFD400", textSize: 56, x: 880, y: 950 },
+      { id: "lbl-tail", kind: "label", entrance: "spring-rise", delay: 38, text: "尾", textColor: "#FFD400", textSize: 56, x: 880, y: 1100 },
+      { id: "sparkle-1", kind: "sparkle", entrance: "spring-pop", delay: 36, x: 240, y: 1180 },
+      { id: "info", kind: "label", entrance: "spring-pop", delay: 50, text: "三维结构", textColor: "#FFD400", textSize: 60, highlight: true, x: 540, y: 1450 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 60, text: "耳朵眼睛一条尾巴", textColor: "#FFFFFF", textSize: 46, x: 540, y: 1720 },
+    ],
+    bgmBeatAt: 60,
+    sfxCues: [
+      { frame: 0, sound: "whoosh" },
+      { frame: 8, sound: "tick" },
+      { frame: 22, sound: "click" },
+      { frame: 30, sound: "click" },
+      { frame: 38, sound: "click" },
+      { frame: 50, sound: "tick" },
+      { frame: 60, sound: "pop" },
+    ],
+  },
+
+  

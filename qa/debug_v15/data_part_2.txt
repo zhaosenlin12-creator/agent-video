@@ -1,0 +1,35 @@
+ 02 MATERIALS ====== 5.8s ======
+  {
+    key: "02_materials",
+    text: "4件东西，30块搞定，学生党都能玩。",
+    emphasis: ["4件", "30块", "学生党"],
+    voiceSec: 4.15,
+    minDur: 5.8,
+    style: "Step",
+    sceneType: "Materials",
+    stepLabel: { en: "STEP 1", cn: "材料清单" },
+    elements: [
+      { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 1 · 材料清单", textColor: "#FFD400", textSize: 56 },
+      { id: "tile-1", kind: "icon", entrance: "spring-pop", delay: 10, iconShape: "printer", text: "3D打印机", textColor: "#FFFFFF", textSize: 46, x: 260, y: 460 },
+      { id: "tile-2", kind: "icon", entrance: "spring-pop", delay: 18, iconShape: "filament", text: "PLA耗材", textColor: "#FFFFFF", textSize: 46, x: 820, y: 460 },
+      { id: "tile-3", kind: "icon", entrance: "spring-pop", delay: 26, iconShape: "arduino", text: "Arduino", textColor: "#FFFFFF", textSize: 46, x: 260, y: 880 },
+      { id: "tile-4", kind: "icon", entrance: "spring-pop", delay: 34, iconShape: "servo", text: "舵机", textColor: "#FFFFFF", textSize: 46, x: 820, y: 880 },
+      { id: "sparkle-1", kind: "sparkle", entrance: "spring-pop", delay: 42, x: 200, y: 1300 },
+      { id: "sparkle-2", kind: "sparkle", entrance: "spring-pop", delay: 46, x: 880, y: 1340 },
+      { id: "price", kind: "label", entrance: "spring-rise", delay: 46, text: "全套 30 元搞定", textColor: "#FFD400", textSize: 56, highlight: true, x: 540, y: 1380 },
+      { id: "price-sub", kind: "label", entrance: "fade", delay: 54, text: "学生党也能玩", textColor: "#FFFFFF", textSize: 48, x: 540, y: 1500 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 62, text: "学生党都能玩", textColor: "#FFFFFF", textSize: 46, x: 540, y: 1720 },
+    ],
+    bgmBeatAt: 60,
+    sfxCues: [
+      { frame: 0, sound: "whoosh" },
+      { frame: 10, sound: "pop" },
+      { frame: 18, sound: "pop" },
+      { frame: 26, sound: "pop" },
+      { frame: 34, sound: "pop" },
+      { frame: 46, sound: "tick" },
+      { frame: 54, sound: "pop" },
+    ],
+  },
+
+  

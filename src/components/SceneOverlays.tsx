@@ -48,7 +48,7 @@ export const PrintOverlay: React.FC<{ f: number }> = ({ f }) => {
         <g style={{ opacity: flowScale }}>
           {/* 流体路径 */}
           <path
-            d={`M ${scanX} ${nozzleY + 40} Q ${scanX - 5} ${nozzleY + 200} ${scanX + 8} ${nozzleY + 400} T ${scanX + 5} ${nozzleY + 700}`}
+            d={`M ${scanX} ${nozzleY + 40} Q ${scanX - 5} ${nozzleY + 200} ${scanX + 8} ${nozzleY + 400} T ${scanX + 5} ${nozzleY + 310}`}
             stroke="#FFD400"
             strokeWidth="14"
             fill="none"
@@ -58,7 +58,7 @@ export const PrintOverlay: React.FC<{ f: number }> = ({ f }) => {
           {/* 堆积层 - 半透明叠加 */}
           <ellipse
             cx={scanX}
-            cy={nozzleY + 700}
+            cy={nozzleY + 310}
             rx={60 + ((f - 28) % 60) * 0.5}
             ry={12}
             fill="#FFD400"

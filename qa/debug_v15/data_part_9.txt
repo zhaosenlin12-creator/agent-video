@@ -1,0 +1,27 @@
+ 09 CODE ====== 5.0s ======
+  {
+    key: "09_code",
+    text: "16行代码，尾巴左右摆90度。",
+    emphasis: ["16行代码", "90度摆动"],
+    voiceSec: 3.53,
+    minDur: 5.0,
+    style: "Step",
+    sceneType: "Code",
+    stepLabel: { en: "STEP 8", cn: "烧录代码" },
+    elements: [
+      { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 8 · 烧录代码", textColor: "#FFD400", textSize: 56 },
+      { id: "code", kind: "image", src: "illustrations/09_code_t.png", entrance: "axial-flyin", delay: 8, scale: 0.7, x: 540, y: 920 },
+      { id: "caret", kind: "line", entrance: "shutter", delay: 30 },
+      { id: "info", kind: "label", entrance: "spring-pop", delay: 44, text: "16 行代码", textColor: "#FFD400", textSize: 64, highlight: true, x: 540, y: 1450 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 56, text: "尾巴摆动 90 度", textColor: "#FFFFFF", textSize: 46, x: 540, y: 1720 },
+    ],
+    bgmBeatAt: 70,
+    sfxCues: [
+      { frame: 0, sound: "whoosh" },
+      { frame: 8, sound: "tick" },
+      { frame: 30, sound: "click" },
+      { frame: 44, sound: "tick" },
+    ],
+  },
+
+  

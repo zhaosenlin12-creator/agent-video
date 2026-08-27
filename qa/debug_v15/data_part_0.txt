@@ -1,0 +1,57 @@
+// All scene data for the "一节课打印只活恐龙" 3D printing dinosaur video.
+// v11: 修复文字溢出(WebkitTextStroke 4->2px + 字号收缩) + 漫画 burst 效果 + 更多 sparkle 装饰 + 更多 SFX
+// 13 scenes, viral formula: 数字 + 颠覆 + 情绪词 + 节奏短句
+
+export type SceneKey =
+  | "01_hook"
+  | "02_materials"
+  | "03_model"
+  | "04_slice"
+  | "05_print"
+  | "06_layer"
+  | "07_remove"
+  | "08_servo"
+  | "09_code"
+  | "10_power"
+  | "11_demo"
+  | "12_roar"
+  | "13_endcard";
+
+export type StepStyle = "Hook" | "Step" | "Counter" | "Caption" | "End";
+
+export interface SceneElement {
+  id: string;
+  kind: "title" | "subtitle" | "image" | "icon" | "label" | "step" | "line" | "tag" | "cta" | "sparkle" | "burst";
+  src?: string;
+  scale?: number;
+  x?: number | string;
+  y?: number | string;
+  w?: number | string;
+  h?: number | string;
+  entrance?: "spring-rise" | "spring-pop" | "axial-flyin" | "fade" | "shutter" | "sweep" | "spin-in";
+  delay: number;
+  text?: string;
+  textColor?: string;
+  textSize?: number;
+  highlight?: boolean;
+  iconShape?: "printer" | "filament" | "arduino" | "servo" | "usb" | "tool" | "rocket" | "bolt";
+}
+
+export interface SceneDef {
+  key: SceneKey;
+  text: string;
+  emphasis: string[];
+  voiceSec: number;
+  minDur: number;
+  style: StepStyle;
+  stepLabel?: { en: string; cn: string };
+  counterNumber?: string;
+  illustration?: string;
+  sceneType?: string;
+  elements: SceneElement[];
+  bgmBeatAt?: number;
+  sfxCues?: { frame: number; sound: "pop" | "whoosh" | "click" | "snap" | "riser" | "count" | "power" }[];
+}
+
+export const SCENES: SceneDef[] = [
+  

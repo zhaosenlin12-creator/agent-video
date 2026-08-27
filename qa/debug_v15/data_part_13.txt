@@ -1,0 +1,57 @@
+ 13 ENDCARD ====== 5.5s ======
+  {
+    key: "13_endcard",
+    text: "点赞收藏，下期教你做四足机甲。",
+    emphasis: ["点赞收藏", "四足机甲"],
+    voiceSec: 3.79,
+    minDur: 5.5,
+    style: "End",
+    sceneType: "End",
+    elements: [
+      { id: "heart", kind: "icon", entrance: "spring-pop", delay: 0, iconShape: "rocket", text: "点赞", textColor: "#FFFFFF", textSize: 68, x: 320, y: 440 },
+      { id: "star", kind: "icon", entrance: "spring-pop", delay: 8, iconShape: "rocket", text: "收藏", textColor: "#FFFFFF", textSize: 68, x: 760, y: 440 },
+      { id: "title", kind: "burst", entrance: "spring-pop", delay: 22, text: "下期更精彩", textColor: "#B81F1F", textSize: 54, x: 540, y: 850 },
+      { id: "preview", kind: "image", src: "illustrations/13_flash3.png", entrance: "axial-flyin", delay: 36, scale: 0.42, x: "50%", y: 1220 },
+      { id: "follow", kind: "label", entrance: "spring-pop", delay: 60, text: "关注我不错过", textColor: "#FFD400", textSize: 56, highlight: true, x: "50%", y: 1560 },
+      { id: "sparkle-1", kind: "sparkle", entrance: "spring-pop", delay: 24, x: 200, y: 800 },
+      { id: "sparkle-2", kind: "sparkle", entrance: "spring-pop", delay: 28, x: 880, y: 850 },
+      { id: "sparkle-3", kind: "sparkle", entrance: "spring-pop", delay: 32, x: 240, y: 1300 },
+      { id: "sparkle-4", kind: "sparkle", entrance: "spring-pop", delay: 36, x: 840, y: 1320 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 76, text: "下期教你做四足机甲", textColor: "#FFFFFF", textSize: 46, x: "50%", y: 1720 },
+    ],
+    bgmBeatAt: 80,
+    sfxCues: [
+      { frame: 0, sound: "pop" },
+      { frame: 8, sound: "pop" },
+      { frame: 22, sound: "pop" },
+      { frame: 36, sound: "tick" },
+      { frame: 60, sound: "tick" },
+      { frame: 24, sound: "tick" },
+      { frame: 28, sound: "tick" },
+      { frame: 32, sound: "tick" },
+    ],
+  },
+];
+
+export const FPS = 30;
+
+export function durToFrames(sec: number): number {
+  return Math.max(1, Math.round(sec * FPS));
+}
+
+export function sceneFrames(s: SceneDef): number {
+  const dur = Math.max(s.minDur, s.voiceSec + 0.4);
+  return durToFrames(dur);
+}
+
+export function totalFrames(): number {
+  let total = 0;
+  for (const s of SCENES) total += sceneFrames(s);
+  return total;
+}
+
+export function sceneFrameRange(idx: number): { start: number; duration: number } {
+  let start = 0;
+  for (let i = 0; i < idx; i++) start += sceneFrames(SCENES[i]);
+  return { start, duration: sceneFrames(SCENES[idx]) };
+}

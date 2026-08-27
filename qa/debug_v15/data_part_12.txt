@@ -1,0 +1,27 @@
+ 12 ROAR ====== 5.5s ======
+  {
+    key: "12_roar",
+    text: "按下遥控，一声吼叫，全班都围过来。",
+    emphasis: ["吼叫", "全班围过来"],
+    voiceSec: 4.06,
+    minDur: 5.5,
+    style: "Caption",
+    sceneType: "Roar",
+    elements: [
+      { id: "dino", kind: "image", src: "illustrations/12_roar_t.png", entrance: "spring-rise", delay: 0, scale: 0.7, x: 540, y: 900 },
+      { id: "roar", kind: "line", entrance: "sweep", delay: 12 },
+      { id: "wave", kind: "line", entrance: "sweep", delay: 22 },
+      { id: "people", kind: "line", entrance: "sweep", delay: 36 },
+      { id: "burst", kind: "burst", entrance: "spring-pop", delay: 60, text: "全班围过来", textColor: "#B81F1F", textSize: 56, x: 540, y: 1480 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 50, text: "一声吼叫", textColor: "#FFFFFF", textSize: 50, x: 540, y: 1720 },
+    ],
+    bgmBeatAt: 80,
+    sfxCues: [
+      { frame: 0, sound: "whoosh" },
+      { frame: 12, sound: "tick" },
+      { frame: 22, sound: "riser" },
+      { frame: 60, sound: "pop" },
+    ],
+  },
+
+  

@@ -1,15 +1,8 @@
 import React from "react";
-import { useCurrentFrame, interpolate, Img, staticFile } from "remotion";
+import { useCurrentFrame, interpolate, Img, staticFile, useVideoConfig } from "remotion";
 import type { SceneElement } from "../data";
 import { ElementRenderer } from "../components/ElementRenderer";
 
-// 通用 Step Scene：5 层 z-index 严格分层
-//   z=0  Background scene image (full screen, dark overlay)
-//   z=1  Grid lines + radial glow
-//   z=2  （已删除：AI 角落点缀，避免右下角突兀小图）
-//   z=3  Main hero elements (centered, scaled up)
-//   z=4  SVG Overlay (custom per scene)
-//   z=5  Caption (bottom safe zone)
 interface Props {
   elements: SceneElement[];
   caption: string;
@@ -18,6 +11,7 @@ interface Props {
   captionSize?: number;
   bg?: string;
   sceneBackground?: string;
+  duration?: number;
   Overlay?: React.FC<{ f: number }>;
 }
 
@@ -29,9 +23,14 @@ export const StepScene: React.FC<Props> = ({
   captionSize = 64,
   bg = "#0a0c14",
   sceneBackground,
+  duration,
   Overlay,
 }) => {
   const f = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+  const totalDur = duration || durationInFrames;
+  const FADE_DUR = 12;
+
   const captionOpacity = interpolate(f, [captionDelay, captionDelay + 15], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -42,6 +41,12 @@ export const StepScene: React.FC<Props> = ({
   });
 
   const sceneBgOpacity = interpolate(f, [0, 12], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  // 场景结束淡入黑色：最后 FADE_DUR 帧
+  const endFadeOpacity = interpolate(f, [totalDur - FADE_DUR, totalDur], [0, 0.92], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -82,7 +87,6 @@ export const StepScene: React.FC<Props> = ({
         fontFamily: "Microsoft YaHei, PingFang SC, sans-serif",
       }}
     >
-      {/* === z=0 全屏场景背景 === */}
       {sceneBackground && (
         <>
           <div
@@ -95,7 +99,7 @@ export const StepScene: React.FC<Props> = ({
             }}
           >
             <Img
-              src={staticFile(`illustrations/${sceneBackground}.png`)}
+              src={staticFile("illustrations/" + sceneBackground + ".png")}
               style={{
                 width: "100%",
                 height: "100%",
@@ -116,7 +120,6 @@ export const StepScene: React.FC<Props> = ({
         </>
       )}
 
-      {/* === z=1 网格 === */}
       <div
         style={{
           position: "absolute",
@@ -140,7 +143,6 @@ export const StepScene: React.FC<Props> = ({
         }}
       />
 
-      {/* === z=3 主体元素（hero，含透明角色） === */}
       {elements
         .filter((el) => el.kind !== "line")
         .sort((a, b) => a.delay - b.delay)
@@ -150,14 +152,12 @@ export const StepScene: React.FC<Props> = ({
           </div>
         ))}
 
-      {/* === z=4 SVG overlay === */}
       {Overlay && (
         <div style={{ position: "absolute", inset: 0, zIndex: 4, pointerEvents: "none" }}>
           <Overlay f={f} />
         </div>
       )}
 
-      {/* === z=5 字幕 === */}
       <div
         style={{
           position: "absolute",
@@ -166,7 +166,7 @@ export const StepScene: React.FC<Props> = ({
           bottom: 200,
           textAlign: "center",
           opacity: captionOpacity,
-          transform: `translateY(${captionY}px)`,
+          transform: "translateY(" + captionY + "px)",
           zIndex: 5,
           pointerEvents: "none",
         }}
@@ -184,11 +184,24 @@ export const StepScene: React.FC<Props> = ({
             borderLeft: "6px solid #FFD400",
             maxWidth: "90%",
             lineHeight: 1.35,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
           }}
         >
           {renderCaption()}
         </div>
       </div>
+
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "#000000",
+          opacity: endFadeOpacity,
+          pointerEvents: "none",
+          zIndex: 6,
+        }}
+      />
     </div>
   );
 };

@@ -1,0 +1,29 @@
+ 07 REMOVE ====== 5.0s ======
+  {
+    key: "07_remove",
+    text: "抠下成品，掰掉支撑，打磨边角。",
+    emphasis: ["取下", "一气呵成"],
+    voiceSec: 3.86,
+    minDur: 5.0,
+    style: "Step",
+    sceneType: "Remove",
+    stepLabel: { en: "STEP 6", cn: "取下成品" },
+    elements: [
+      { id: "step", kind: "step", entrance: "spring-pop", delay: 0, text: "STEP 6 · 取下成品", textColor: "#FFD400", textSize: 56 },
+      { id: "part", kind: "image", src: "illustrations/07_remove_t.png", entrance: "axial-flyin", delay: 8, scale: 0.7, x: 540, y: 920 },
+      { id: "grip", kind: "line", entrance: "sweep", delay: 22 },
+      { id: "twist", kind: "line", entrance: "sweep", delay: 34 },
+      { id: "check", kind: "label", entrance: "spring-pop", delay: 52, text: "完成", textColor: "#FFD400", textSize: 76, highlight: true, x: 540, y: 1450 },
+      { id: "cap", kind: "label", entrance: "fade", delay: 64, text: "一气呵成", textColor: "#FFFFFF", textSize: 46, x: 540, y: 1720 },
+    ],
+    bgmBeatAt: 70,
+    sfxCues: [
+      { frame: 0, sound: "whoosh" },
+      { frame: 8, sound: "tick" },
+      { frame: 22, sound: "click" },
+      { frame: 34, sound: "tick" },
+      { frame: 52, sound: "tick" },
+    ],
+  },
+
+  
