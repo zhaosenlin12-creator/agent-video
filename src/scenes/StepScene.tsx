@@ -5,11 +5,11 @@ import { ElementRenderer } from "../components/ElementRenderer";
 
 // 通用 Step Scene：5 层 z-index 严格分层
 //   z=0  Background scene image (full screen, dark overlay)
-//   z=1  Grid lines (subtle)
-//   z=2  AI accent (corner, optional)
+//   z=1  Grid lines + radial glow
+//   z=2  （已删除：AI 角落点缀，避免右下角突兀小图）
 //   z=3  Main hero elements (centered, scaled up)
-//   z=4  Text overlays (labels, step number, side panels)
-//   z=5  Caption (bottom, semi-transparent backdrop)
+//   z=4  SVG Overlay (custom per scene)
+//   z=5  Caption (bottom safe zone)
 interface Props {
   elements: SceneElement[];
   caption: string;
@@ -17,10 +17,7 @@ interface Props {
   captionDelay?: number;
   captionSize?: number;
   bg?: string;
-  backgroundImage?: string;       // 角落 AI 小图（值已含 illustrations/ 前缀，如 illustrations/02_materials.png）
-  backgroundOpacity?: number;
-  sceneBackground?: string;        // 场景背景 key（不含 .png），如 bg_01_hook
-  // Specific overlay component (e.g., counter, scan, etc.)
+  sceneBackground?: string;
   Overlay?: React.FC<{ f: number }>;
 }
 
@@ -31,8 +28,6 @@ export const StepScene: React.FC<Props> = ({
   captionDelay = 8,
   captionSize = 64,
   bg = "#0a0c14",
-  backgroundImage,
-  backgroundOpacity = 0.18,
   sceneBackground,
   Overlay,
 }) => {
@@ -46,13 +41,11 @@ export const StepScene: React.FC<Props> = ({
     extrapolateRight: "clamp",
   });
 
-  // Background scene fade-in (only first 12 frames)
   const sceneBgOpacity = interpolate(f, [0, 12], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Render emphasis words in caption
   const renderCaption = () => {
     let remaining = caption;
     const parts: React.ReactNode[] = [];
@@ -72,8 +65,7 @@ export const StepScene: React.FC<Props> = ({
         }
       }
       if (!matched) {
-        const ch = remaining[0];
-        parts.push(<span key={idx++}>{ch}</span>);
+        parts.push(<span key={idx++}>{remaining[0]}</span>);
         remaining = remaining.slice(1);
       }
     }
@@ -111,13 +103,12 @@ export const StepScene: React.FC<Props> = ({
               }}
             />
           </div>
-          {/* 深色蒙层确保前景可读 */}
           <div
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(180deg, rgba(10,12,20,0.55) 0%, rgba(10,12,20,0.78) 50%, rgba(10,12,20,0.92) 100%)",
+                "linear-gradient(180deg, rgba(10,12,20,0.45) 0%, rgba(10,12,20,0.55) 50%, rgba(10,12,20,0.75) 100%)",
               pointerEvents: "none",
               opacity: sceneBgOpacity,
             }}
@@ -125,7 +116,7 @@ export const StepScene: React.FC<Props> = ({
         </>
       )}
 
-      {/* === z=1 网格 (subtle) === */}
+      {/* === z=1 网格 === */}
       <div
         style={{
           position: "absolute",
@@ -136,45 +127,20 @@ export const StepScene: React.FC<Props> = ({
           pointerEvents: "none",
         }}
       />
-      {/* 暖色径向高光（强化中心主体） */}
       <div
         style={{
           position: "absolute",
           left: "50%",
-          top: "42%",
+          top: "45%",
           translate: "-50% -50%",
           width: 1400,
           height: 1400,
-          background: "radial-gradient(circle, rgba(255,212,0,0.08) 0%, transparent 55%)",
+          background: "radial-gradient(circle, rgba(255,212,0,0.10) 0%, transparent 55%)",
           pointerEvents: "none",
         }}
       />
 
-      {/* === z=2 AI 角落点缀（可选） === */}
-      {backgroundImage && (
-        <div
-          style={{
-            position: "absolute",
-            left: "76%",
-            top: "78%",
-            translate: "-50% -50%",
-            width: "30%",
-            height: "22%",
-            opacity: backgroundOpacity,
-            pointerEvents: "none",
-            filter: "blur(3px) saturate(0.65)",
-            zIndex: 2,
-          }}
-        >
-          <Img
-            src={staticFile(backgroundImage)}
-            style={{ width: "100%", height: "100%", objectFit: "contain" }}
-            alt=""
-          />
-        </div>
-      )}
-
-      {/* === z=3 主体元素（hero） === */}
+      {/* === z=3 主体元素（hero，含透明角色） === */}
       {elements
         .filter((el) => el.kind !== "line")
         .sort((a, b) => a.delay - b.delay)
@@ -184,14 +150,14 @@ export const StepScene: React.FC<Props> = ({
           </div>
         ))}
 
-      {/* === z=4 SVG overlay (custom per scene) === */}
+      {/* === z=4 SVG overlay === */}
       {Overlay && (
         <div style={{ position: "absolute", inset: 0, zIndex: 4, pointerEvents: "none" }}>
           <Overlay f={f} />
         </div>
       )}
 
-      {/* === z=5 字幕 (bottom safe zone) === */}
+      {/* === z=5 字幕 === */}
       <div
         style={{
           position: "absolute",

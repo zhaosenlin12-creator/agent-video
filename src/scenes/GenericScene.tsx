@@ -29,24 +29,7 @@ const getOverlay = (sceneType: string | undefined): React.FC<{ f: number }> | un
   }
 };
 
-// 角落 AI 点缀图（可保留也可去掉，新版主要靠 sceneBackground）
-const getBackgroundImage = (sceneType: string | undefined): string | undefined => {
-  switch (sceneType) {
-    case "Materials": return "illustrations/02_materials.png";
-    case "Model": return "illustrations/03_model.png";
-    case "Print": return "illustrations/05_print.png";
-    case "Layer": return "illustrations/06_layer.png";
-    case "Remove": return "illustrations/07_remove.png";
-    case "Servo": return "illustrations/08_servo.png";
-    case "Code": return "illustrations/09_code.png";
-    case "Power": return "illustrations/10_power.png";
-    case "Demo": return "illustrations/11_demo.png";
-    case "Roar": return "illustrations/12_roar.png";
-    default: return undefined;
-  }
-};
-
-// 全屏场景背景映射：每个 sceneType 对应一张场景图
+// 全屏场景背景映射：每个 sceneType 对应一张新生成的空场景背景
 const getSceneBackground = (sceneType: string | undefined): string | undefined => {
   switch (sceneType) {
     case "Hook": return "bg_01_hook";
@@ -67,21 +50,19 @@ const getSceneBackground = (sceneType: string | undefined): string | undefined =
 };
 
 // 通用场景渲染器：从 SceneDef 派发
+// v8: 不再传 backgroundImage（角落点缀），完全靠 sceneBackground + 透明角色 + Remotion 动画
 export const GenericScene: React.FC<{ scene: SceneDef }> = ({ scene }) => {
   const overlay = getOverlay(scene.sceneType);
-  const bgImg = getBackgroundImage(scene.sceneType);
   const sceneBg = getSceneBackground(scene.sceneType);
 
-  // 把 line 元素过滤掉（这些由 Overlay 渲染），保留其它元素
   const filtered = scene.elements.filter((el) => el.kind !== "line");
-
-  // 找到 caption 元素（label 类型的，无 highlight，textSize < 80）
-  const captionEl = filtered.find((el) => el.kind === "label" && !el.highlight && (el.textSize || 0) < 80);
+  const captionEl = filtered.find(
+    (el) => el.kind === "label" && !el.highlight && (el.textSize || 0) < 80
+  );
   const caption = captionEl?.text || scene.text;
   const captionEmphasis = scene.emphasis;
   const captionDelay = captionEl?.delay ?? 8;
 
-  // 把 captionEl 从 elements 中过滤掉，避免双重渲染（caption 由 StepScene 统一渲染）
   const elements = captionEl
     ? filtered.filter((el) => el !== captionEl)
     : filtered;
@@ -93,8 +74,6 @@ export const GenericScene: React.FC<{ scene: SceneDef }> = ({ scene }) => {
       captionEmphasis={captionEmphasis}
       captionDelay={captionDelay}
       captionSize={captionEl?.textSize || 64}
-      backgroundImage={bgImg}
-      backgroundOpacity={0.18}
       sceneBackground={sceneBg}
       Overlay={overlay}
     />
