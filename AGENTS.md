@@ -1,4 +1,4 @@
-# Agent Video 工作流规则 (v10 lessons learned)
+# Agent Video 工作流规则 (v18 lessons learned)
 
 本仓库:`agent-video` —— "一节课打印只活恐龙" 抖音竖屏短视频 Remotion 工程。
 **严格遵守以下规则,避免重复犯错。**
@@ -178,7 +178,55 @@
 | v8 | b2ed2c0 | rembg 抠图 + 删角落 AI 点缀 |
 | v9 | 6b855e6 | 修复文字溢出/重叠 + sparkle |
 | v10 | (TBD) | 换卡通音色 + 修标签位置 + 转场 |
+| v15-v18 | d4a79fc | cropped subjects centered + HookScene rebuild + text glow shrink + burst pos fix + cartoon vibe |
 
 ---
+
+
+---
+
+## 9. v15-v18 new lessons (fix from root)
+
+### 9.1 transparent PNG subject offset
+- AI-generated 1080x1920 transparent PNGs often have subject off-center
+- e.g. 07_remove subject bbox center=(593,942) but canvas center=(540,960)
+- Direct render leads to subject on right side
+- **Fix**: crop to subject bbox, then use subject bbox center as new canvas center
+- Pad with transparent pixels to fill edges
+- Verification: subject_center must equal canvas_center (offset=0)
+
+### 9.2 explicit w/h not scale
+- ElementRenderer used w = el.scale * 1080, h = min(w*1.4, 1180)
+- This distorts aspect ratio (assumes 1.4 but actual is 0.7-1.9)
+- **Fix**: each image element in data.ts has explicit w/h matching _tc.png aspect
+- objectFit:contain handles the rest
+
+### 9.3 textShadow glow too wide
+- 30px blur textShadow spreads far beyond 30px in actual render
+- Triggers false CLIP detection
+- **Fix**: shrink glow to 2-12px, keep visual effect without overflow
+
+### 9.4 HookScene element overlap
+- 4 elements stacked vertically with wrong y values
+- Title/subtitle/bottom all clustered at y=1620/1820
+- **Fix**: explicit y layering: title y=300/480, dino y=960 h=750, subtitle y=1480, bottom y=1720
+
+### 9.5 PrintOverlay fluid path too long
+- Fluid path from nozzleY=600 to nozzleY+700=1300 spans whole canvas
+- **Fix**: shorten to nozzleY+310=910, keeps fluid in upper area
+
+### 9.6 EndCardScene text overflow
+- top=1750 + fontSize=80 + default whiteSpace=normal
+- Text wraps to 2 lines, second line cut off by canvas bottom
+- **Fix**: add whiteSpace: nowrap, fontSize 80->60
+
+### 9.7 verifier false positive on bg colors
+- yellow-at-x>=1060 detection flags 5+ scenes incorrectly
+- Root cause: bg_XX.png backgrounds have warm light (windows/lamps)
+- **Fix**: visual contact sheet + thumb check, not just edge pixel detection
+
+### 9.8 burst text overflow
+- 200-layer-path burst at y=1450 overlaps image element below
+- **Fix**: burst default y=1400, textSize 56->52
 
 **违反以上规则导致的问题,一律视为代码 bug,记一次 v(N+1) 修复。**
